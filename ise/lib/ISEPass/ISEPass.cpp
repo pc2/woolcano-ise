@@ -25,8 +25,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <llvm/Module.h>
 #include <llvm/Pass.h>
+#include "llvm/PassManager.h"
 #include <llvm/Support/CommandLine.h>
-#include <llvm/Analysis/ProfileInfoLoader.h>
+#include <llvm/Analysis/ProfileInfo.h>
+//#include <llvm/Analysis/ProfileInfoLoader.h>
 #include <vector>
 #include <map>
 #include "IseAlgorithm.h"
@@ -67,6 +69,12 @@ static cl::opt<string> ISESelAlgorithm("ise-sel-algorithm", cl::init("method1"),
 									cl::value_desc("algorithm"),
 									cl::desc("Select ISE selection algorithm: method1 (def.), random"));
 
+static double ignoreMissing(double w) {
+  if (w == ProfileInfo::MissingValue) return 0;
+  return w;
+}
+
+
 namespace {
 	class ISEPass : public ModulePass
 	{
@@ -106,8 +114,11 @@ static RegisterPass<RuntimeEstimationPass> Y("runtime-estimation", "simple runti
 
 void ISEPass::getAnalysisUsage(AnalysisUsage &AU) const
 {
-	if (ISEBenchmark)
+	// CP TODO: think about why Martin enables setPreservesAll only when benchmarking
+	//if (ISEBenchmark) {
 		AU.setPreservesAll();
+	//}
+  AU.addRequired<ProfileInfo>();
 }
 
 bool ISEPass::ProfileListSortPredicate(const ProfilePair& lhs, const ProfilePair& rhs)
@@ -130,9 +141,34 @@ DataFlowGraph ISEPass::dfgFromBasicBlock(const BasicBlock* bb)
 */
 void ISEPass::readProfilingInfo(Module &M)
 {
-	if (Util::fileExists(ISEProfInfoFilename))
+//	if (Util::fileExists(ISEProfInfoFilename))
+	if (true)
 	{
-		ProfileInfoLoader PIL("ise", ISEProfInfoFilename, M);
+//	ProfileInfoLoader PIL("ise", ISEProfInfoFilename, M);
+	ProfileInfo &PI = getAnalysis<ProfileInfo>();
+	
+	typedef vector< pair<BasicBlock*, unsigned> > ProfileInfoVector;
+	ProfileInfoVector counts;
+	double totalExecutions = 0;
+  for (Module::iterator FI = M.begin(), FE = M.end(); FI != FE; ++FI) {
+    for (Function::iterator BB = FI->begin(), BBE = FI->end(); 
+         BB != BBE; ++BB) {
+      double w = ignoreMissing(PI.getExecutionCount(BB));
+			printf("BB named '%s' was executed %f times\n",BB->getName().data(),w);
+      counts.push_back(std::make_pair(BB, w));
+			totalExecutions += w;
+    }
+  }
+	for (ProfileInfoVector::const_iterator it = counts.begin();
+		it != counts.end(); ++it)
+	{
+		ProfileInfo2 info(it->second, it->second / totalExecutions);
+		profileMap.insert(make_pair(it->first, info));
+		profileList.push_back(make_pair(it->first, info));
+	}
+	
+
+#if 0		
 		if (PIL.hasAccurateBlockCounts())
 		{
 			typedef vector< pair<BasicBlock*, unsigned> > ProfileInfoVector;
@@ -147,19 +183,22 @@ void ISEPass::readProfilingInfo(Module &M)
 			for (ProfileInfoVector::const_iterator it = counts.begin();
 				it != counts.end(); ++it)
 			{
-				ProfileInfo info(it->second, it->second / totalExecutions);
+				ProfileInfo2 info(it->second, it->second / totalExecutions);
 				profileMap.insert(make_pair(it->first, info));
 				profileList.push_back(make_pair(it->first, info));
 			}
 		}
+#endif	
 	}
+
+#if 1
 	if (profileList.size() == 0)
 	{
 		llvm::cerr << "WARNING: no profiling information found, assuming uniform distribution\n";
 		double bbc = 0;
 		for (Module::const_iterator I = M.begin(), E = M.end(); I != E; ++I)
 			bbc += I->size();
-		ProfileInfo info(1, 1.0f / bbc);
+		ProfileInfo2 info(1, 1.0f / bbc);
 		for (Module::const_iterator I = M.begin(), E = M.end(); I != E; ++I)
 			for (Function::const_iterator BB = I->begin(), E = I->end(); BB != E; ++BB)
 			{
@@ -167,7 +206,9 @@ void ISEPass::readProfilingInfo(Module &M)
 				profileList.push_back(make_pair(&*BB, info));
 			}
 	}
+#endif
 	profileList.sort(ProfileListSortPredicate);
+
 }
 
 Architecture* ISEPass::getArchitecture(void)
@@ -269,7 +310,7 @@ bool ISEPass::runOnModule(Module &M)
 				resultMap.insert(make_pair(BB, resultVector));
 			if (ISEOutputGraphs)
 			{
-				string blockName = modName + "_" + I->getName() + "_" + BB->getName() + "_" + Util::stringify(nB);
+				string blockName = modName + "_" + I->getNameStr() + "_" + BB->getNameStr() + "_" + Util::stringify(nB);
 				Util::dumpToFile(blockName + ".gv", dfg.writeGraphviz(true, true));
 				for (unsigned i = 0; i < resultVector.size(); ++i)
 				{
@@ -400,9 +441,9 @@ void ISEPass::moveSubgraphToFunction(BasicBlock* bb, const DataFlowGraph &dfg,
 		paramTypes.push_back(value->getType());
 		params.push_back(const_cast<Value*>(value));
 	}
-	Function* function = Function::Create(FunctionType::get(outputValue->getType(), paramTypes, false), 
-    GlobalValue::WeakAnyLinkage, name, bb->getParent()->getParent());
-	BasicBlock* newBb = BasicBlock::Create(name + string("_entry"), function);
+	Function* function = Function::Create(FunctionType::get(outputValue->getType(), paramTypes, false),
+		GlobalValue::WeakAnyLinkage, name, bb->getParent()->getParent());
+	BasicBlock* newBb = BasicBlock::Create(getGlobalContext(), name + string("_entry"), function);
 	// insert function call
 	CallInst* call = CallInst::Create(function, params.begin(), params.end(), 
 		name + string("_call"), insertCallPos);
@@ -421,11 +462,9 @@ void ISEPass::moveSubgraphToFunction(BasicBlock* bb, const DataFlowGraph &dfg,
 			++use_it;
 	}
 	// insert instructions in topological order
-	ReturnInst* retInst = ReturnInst::Create(outputValue, newBb);
-
-	DataFlowGraph::VertexVector::const_reverse_iterator it = topo.rbegin();
-	DataFlowGraph::VertexVector::const_reverse_iterator ite = topo.rend();
-	for (; it != ite; ++it )
+	ReturnInst* retInst = ReturnInst::Create(getGlobalContext(),outputValue, newBb);
+	for (DataFlowGraph::VertexVector::const_reverse_iterator it = topo.rbegin();
+		it != topo.rend(); ++it)
 	{
 		DataFlowGraph::operator_t type = dfg.getType(*it);
 		if (type == DataFlowGraph::OUTPUT || type == DataFlowGraph::OPERATOR)
@@ -461,10 +500,29 @@ void ISEPass::moveSubgraphToFunction(BasicBlock* bb, const DataFlowGraph &dfg,
 void RuntimeEstimationPass::getAnalysisUsage(AnalysisUsage &AU) const
 {
 	AU.setPreservesAll();
+  AU.addRequired<ProfileInfo>();
 }
 
 bool RuntimeEstimationPass::runOnModule(Module &M)
 {
+
+//	ProfileInfoLoader PIL("ise", "llvmprof.out", M);
+	ProfileInfo &PI = getAnalysis<ProfileInfo>();
+
+	typedef vector< pair<BasicBlock*, unsigned> > ProfileInfoVector;
+	ProfileInfoVector counts;
+
+  for (Module::iterator FI = M.begin(), FE = M.end(); FI != FE; ++FI) {
+    if (FI->isDeclaration()) continue;
+    double w = ignoreMissing(PI.getExecutionCount(FI));
+    for (Function::iterator BB = FI->begin(), BBE = FI->end(); 
+         BB != BBE; ++BB) {
+      double w = ignoreMissing(PI.getExecutionCount(BB));
+      counts.push_back(std::make_pair(BB, w));
+    }
+  }
+
+#if 0
 	ProfileInfoLoader PIL("ise", "llvmprof.out", M);
 	typedef vector< pair<BasicBlock*, unsigned> > ProfileInfoVector;
 	ProfileInfoVector counts;
@@ -472,6 +530,8 @@ bool RuntimeEstimationPass::runOnModule(Module &M)
 	{
 		PIL.getBlockCounts(counts);
 	}
+#endif
+
 	ProfileInfoVector::const_iterator prof_it = counts.begin();
 	// estimate runtime
 	ArchitectureVirtexFx arch;
@@ -489,7 +549,7 @@ bool RuntimeEstimationPass::runOnModule(Module &M)
 				arch.getSwInstructionTiming(BB->getTerminator());
 			unsigned int hwsg = arch.convertHwToSwTiming(RuntimeEstimation::estimateHwRuntime(dfg, arch))
 				+ arch.getExecutionOverhead(dfg.num_inputs(), dfg.num_outputs());
-			llvm::cout << I->getName() << "() - " << BB->getName() << "\tsw: " <<
+			llvm::cout << I->getNameStr() << "() - " << BB->getNameStr() << "\tsw: " <<
 				swsg << "\thw: " << hwsg;
 			if (prof_it != counts.end())
 			{
