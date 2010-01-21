@@ -1,5 +1,6 @@
-This work is based on the Martin Tofall code.
+This work is based on code from Martin Tofall.
 License: BSD
+
 
 =============================================================================
 
