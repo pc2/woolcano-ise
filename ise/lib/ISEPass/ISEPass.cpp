@@ -52,8 +52,7 @@ static cl::opt<string> ISEProfInfoFilename("ise-profile-info-file", cl::init("ll
 										   cl::value_desc("filename"),
 										   cl::desc("Profile file used by -ise"));
 static cl::opt<bool> ISEOutputGraphs("ise-output-graphs", cl::desc("output Graphviz files"));
-static cl::opt<bool> ISEOutputSelected("ise-output-selected");
-static cl::opt<bool> ISEfoo("ise-foo");
+static cl::opt<bool> ISEOutputSelected("ise-output-selected", cl::desc("output Graphviz files for selected templates"));
 static cl::opt<bool> ISEBenchmark("ise-benchmark");
 static cl::opt<bool> ISENoSplitConstants("ise-no-split-constants");
 static cl::opt<bool> ISERuntimeEstimation("ise-runtime-estimation");
@@ -214,12 +213,6 @@ bool ISEPass::runOnModule(Module &M)
 	ResultMap resultMap;
 	DfgMap dfgMap;
 	string modName = M.getModuleIdentifier().substr(M.getModuleIdentifier().find_last_of("/\\") + 1);
-  
-   if (ISEfoo) 
-   {
-      llvm::cout << "dupa" << endl;
-      return 1;
-   }
 	if (ISEBenchmark)
 		llvm::cout << "#Nodes\tmsecs\n";
 	for (Module::const_iterator I = M.begin(), E = M.end(); I != E; ++I)
