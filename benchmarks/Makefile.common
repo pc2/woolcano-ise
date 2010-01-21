@@ -1,0 +1,2 @@
+CCOPTS = -O3 -emit-llvm
+CC = llvm-gcc

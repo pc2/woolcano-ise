@@ -1,0 +1,4 @@
+#!/bin/sh
+make
+lli cjpeg_.bc -dct int -progressive -opt -outfile output1/output_small_encode_.jpeg input1/input_small.ppm
+diff output1/output_small_encode_.jpeg output1/output_small_encode.jpeg

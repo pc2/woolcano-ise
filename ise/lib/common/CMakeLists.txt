@@ -1,0 +1,16 @@
+add_llvm_library(LLVMISECommon
+  AlgoMaxMiso.cpp
+  AlgoMultipleCuts.cpp
+  AlgoSingleCut.cpp
+  AlgoUnion.cpp
+  ArchitectureVirtexFx.cpp
+  ArchitectureVirtual.cpp
+  Benchmark.cpp
+  DataFlowGraph.cpp
+  IseAlgorithm.cpp
+  Primitives.cpp
+  RuntimeEstimation.cpp
+  SelectionMethod1.cpp
+  SelectionRandom.cpp
+  Util.cpp
+  )
