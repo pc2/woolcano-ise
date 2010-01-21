@@ -32,18 +32,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <list>
 #include <utility>
 
-class ProfileInfo2
+class ProfileInfo
 {
 public:
-	ProfileInfo2(unsigned int c, double p) : count(c), prob(p) {}
+	ProfileInfo(unsigned int c, double p) : count(c), prob(p) {}
 	unsigned int count;
 	double prob;
 };
 
 typedef boost::dynamic_bitset<> BitVector;
 typedef std::vector<BitVector> ResultVector;
-typedef std::map<const llvm::BasicBlock*, ProfileInfo2> ProfileMap;
-typedef std::pair<const llvm::BasicBlock*, ProfileInfo2> ProfilePair;
+typedef std::map<const llvm::BasicBlock*, ProfileInfo> ProfileMap;
+typedef std::pair<const llvm::BasicBlock*, ProfileInfo> ProfilePair;
 typedef std::list<ProfilePair> ProfileList;
 typedef std::map<const llvm::BasicBlock*, ResultVector> ResultMap;
 class DataFlowGraph;
