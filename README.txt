@@ -7,7 +7,7 @@ In the top of the repo (woolcano-ise/) type the following:
 This will build up the code under seperate dir (build/) than sources (ise/).
 
 Doxygen documentation
-=========================
+=====================
 
 1. Get doxygen for MAC: ftp://ftp.stack.nl/pub/users/dimitri/Doxygen-1.6.2.dmg
 2. Install it to the /Applications folder
