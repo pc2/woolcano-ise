@@ -1,0 +1,62 @@
+# =======================================================
+NAME:     adpcm    
+GROUP:    Media App
+AUTHOR:   Stichting Mathematisch Centrum    
+LICENSE:  restricted to everything (but available in Mediabench?)
+LINK:     Part of MediaBench: http://euler.slu.edu/~fritts/mediabench/ 
+
+# =======================================================
+NAME:     cjpeg
+GROUP:    Media App
+AUTHOR:   Thomas G. Lane
+LICENSE:  no problems
+LINK:     https://www.flypig.org.uk/trac/repos/browser/Vendor/libjpeg/current/src/README
+
+# =======================================================
+NAME:     aes
+GROUP:    crypto
+AUTHOR:   Brian Gladman
+LICENSE:  no problems
+LINK:     http://www.gladman.me.uk
+
+# =======================================================
+NAME:     blowfish
+GROUP:    crypto
+AUTHOR:   
+LICENSE:  OpenSource
+LINK:     Part of the OpenSSL: http://www.openssl.org
+
+# =======================================================
+NAME:     md5
+GROUP:    hash function
+AUTHOR:   L. Peter Deutsch, glenn McGrath
+LICENSE:  OpenSource
+LINK:     Part of the zlib/libpng: http://sourceforge.net/projects/libmd5-rfc/ 
+
+# =======================================================
+NAME:     sha
+GROUP:    hash function
+AUTHOR:   Uwe Hollerbach <uh@alumni.caltech.edu> (code bases on Bruce Schneider book)
+LICENSE:  OpenSource
+LINK:     Part of the Mibench I : http://www.eecs.umich.edu/mibench/ 
+
+# =======================================================
+NAME:     Whetstone
+GROUP:    Scientific numberics
+AUTHOR:   Rich Painter <painter@ieee.org>   
+LICENSE:  OpenSource
+LINK:     Part of the NetLib: http://www.netlib.org/benchmark/whetstone.c
+
+# =======================================================
+NAME:     fft
+GROUP:    Scientific numberics
+AUTHOR:   Roldan Pozo, and Bruce Miller (NIST)
+LICENSE:  unknown, source online
+LINK:     Part of the SciMark2: http://math.nist.gov/scimark2/download_c.html 
+
+# =======================================================
+NAME:     sor
+GROUP:    Scientific numberics
+AUTHOR:   Roldan Pozo, and Bruce Miller (NIST)
+LICENSE:  unknown, source online
+LINK:     Part of the SciMark2: http://math.nist.gov/scimark2/download_c.html 
