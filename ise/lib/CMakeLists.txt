@@ -1,4 +1,5 @@
-include(add_llvm_support.cmake)
+set(LEVEL ${CMAKE_CURRENT_SOURCE_DIR}/../../)
+include(${LEVEL}/cmake/add_llvm_support.cmake)
 
 # Discover the projects that use CMake in the subdirectories.
 # Note that explicit cmake invocation is required every time a new project is

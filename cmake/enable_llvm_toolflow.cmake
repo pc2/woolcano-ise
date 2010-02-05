@@ -1,4 +1,5 @@
-message("# Enable LLVM toolflow")
+message(STATUS "Enable LLVM toolflow")
+message(STATUS "====================")
 
 set (compiler        "llvm-gcc")
 set (linker          "llvm-link")
@@ -150,10 +151,49 @@ endmacro(target_link_bc_libraries)
 # ======================================================
 # load custom pass to the opt 
 macro(add_opt_pass)
-   foreach (i ${ARNG})
+   foreach (i ${ARGN})
       set (OPT_FLAGS  ${OPT_FLAGS} -load ${i})
    endforeach(i)
 endmacro(add_opt_pass)
+
+
+# ======================================================
+# run opt on specified file
+# params: t       = target
+#         s       = file (source)
+#         ${ARGN} = additional params
+macro(run_opt_file t src)
+   set(t_outfile ${CMAKE_CURRENT_BINARY_DIR}/${t}.${BC_SUFFIX})
+
+   # opt_generator
+   add_custom_command(
+      OUTPUT  ${t_outfile} 
+      COMMAND ${LLVM_OPT} ${OPT_FLAGS} ${src} ${ARGN} -f -o ${t_outfile}
+      DEPENDS ${src}
+   )
+
+   # register target and make dependency with the opt_generator 
+   # this will be executed allwasy (make all)
+   add_custom_target(${t} ALL DEPENDS ${t_outfile})
+   # assosiate target with output file
+   set_target_properties(${t} PROPERTIES OUTPUT_NAME ${t_outfile})
+endmacro(run_opt_file)
+
+# ======================================================
+# execute opt without building the target 
+# params: o      = output file
+#         src    = src file
+#         dir    = working directory
+#        ${ARGN} = other commands
+macro(exec_opt o src dir)
+  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${dir})
+  message("\n\nRunning opt \n===========")
+  message("WORKING_DIRECTORY: ${dir}/")
+  message("COMMAND ${LLVM_OPT} ${OPT_FLAGS} ${ARGN} -f -o ${o} ${src}\n")
+  execute_process(
+    COMMAND ${LLVM_OPT} ${OPT_FLAGS} ${ARGN} -f -o ${o} ${src}
+    WORKING_DIRECTORY ${dir})
+endmacro(exec_opt src)
 
 
 # ======================================================
@@ -164,19 +204,9 @@ endmacro(add_opt_pass)
 macro(run_opt t s)
    set(t_outfile ${CMAKE_CURRENT_BINARY_DIR}/${t}.${BC_SUFFIX})
    get_target_property(src ${s} OUTPUT_NAME)
-
-   # opt_generator
-   add_custom_command(
-      OUTPUT  ${t_outfile} 
-      COMMAND ${LLVM_OPT} ${OPT_FLAGS} ${src} ${ARGN} -f -o ${t_outfile}
-      DEPENDS ${src}
-   )
-
-   # register target and make dependency with the opt_generator 
-   add_custom_target(${t} ALL DEPENDS ${t_outfile})
-   # assosiate target with output file
-   set_target_properties(${t} PROPERTIES OUTPUT_NAME ${t_outfile})
+   run_opt_file(${t} ${src} ${ARGN})
 endmacro(run_opt)
+
 
 
 # ======================================================
@@ -207,55 +237,4 @@ macro(run_prof t s)
 endmacro(run_prof)
 
 # ======================================================
-# EXAMPLE CMakeFiles.txt
-# ======================================================
 
-
-# project (sor C CXX)
-# 
-# cmake_minimum_required(VERSION 2.6)
-# cmake_policy(SET CMP0011 NEW) 
-# 
-# message("# Creating Makefile for '${PROJECT_NAME}'")
-# 
-# include (enable_llvm_toolflow.cmake)
-# 
-# # ======================================================
-# # adding libraries
-# # ======================================================
-# 
-# # like this:
-# # create libmain.bc from main.c   & libsor.bc from sor.c
-# # add_bc_library(libmain main.c) 
-# # add_bc_library(libsor sor.c)
-# 
-# # or like this
-# # foreach input param create bc file: generate lib${param}.bc
-# add_bc_libraries(main.c sor.c)
-# 
-# 
-# # ======================================================
-# # linking (merging) few libraries into single library
-# # ======================================================
-# # link both libraries to one
-# target_link_bc_libraries(sor libmain libsor) 
-# 
-# 
-# # ======================================================
-# # optimization pass
-# # ======================================================
-# # load custom passes to the optimizer
-# add_opt_pass( )
-# 
-# # run the optimizer with the -dce pass: generate sor_opt.bc from sor.bc  
-# run_opt(sor_opt sor -dce)
-# 
-# 
-# # ======================================================
-# # dissasemble the output: generate sor_opt.ll sor.ll main.ll
-# run_dis(sor_opt libsor libmain)
-# 
-# 
-# # ======================================================
-# # run profiler
-# run_prof(sor_prof sor_opt sor_opt_args )

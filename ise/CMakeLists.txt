@@ -1,5 +1,7 @@
+project(ise C CXX)
 cmake_minimum_required(VERSION 2.6)
 
+message("# Creating Makefiles for '${PROJECT_NAME}'")
 include_directories( include )
 include_directories( /opt/local/include )
 

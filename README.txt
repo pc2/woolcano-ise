@@ -2,9 +2,12 @@ Buidling the source codes
 =========================
 
 In the top of the repo (woolcano-ise/) type the following:
-( mkdir build && cd build && cmake ../ise && make -j2)
+( mkdir build && cd build && cmake ../ise && make -j2 test_ise)
 
-This will build up the code under seperate dir (build/) than sources (ise/).
+This will build up the code under seperate dir (build/),
+next it will compile the ISE pass,
+than it will compile and profile the benchmarking applications,
+finally it will run the ISE pass on top of each application.
 
 Doxygen documentation
 =========================
