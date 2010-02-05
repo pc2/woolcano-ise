@@ -57,12 +57,17 @@ static cl::opt<bool> ISEBenchmark("ise-benchmark");
 static cl::opt<bool> ISENoSplitConstants("ise-no-split-constants");
 static cl::opt<bool> ISERuntimeEstimation("ise-runtime-estimation");
 static cl::opt<unsigned int> ISEBenchmarkTicks("ise-benchmark-ticks", cl::init(2500));
-static cl::opt<string> ISEAlgorithm("ise-algorithm", cl::init("maxmiso"),
-									cl::value_desc("algorithm"),
-									cl::desc("Select ISE identification algorithm: maxmiso (def.), singlecut, multicut, union"));
+
 static cl::opt<string> ISEArchitecture("ise-architecture", cl::init("virtual"),
 									cl::value_desc("architecture"),
 									cl::desc("Select ISE target architecture: virtual (def.), virtex"));
+
+/* Identification algorithm - extracts graphs from app */
+static cl::opt<string> ISEAlgorithm("ise-algorithm", cl::init("maxmiso"),
+									cl::value_desc("algorithm"),
+									cl::desc("Select ISE identification algorithm: maxmiso (def.), singlecut, multicut, union"));
+
+/* Selection Algorithm - selects apropriate BB from identificated graphs */
 static cl::opt<string> ISESelAlgorithm("ise-sel-algorithm", cl::init("method1"),
 									cl::value_desc("algorithm"),
 									cl::desc("Select ISE selection algorithm: method1 (def.), random"));
@@ -115,6 +120,7 @@ bool ISEPass::ProfileListSortPredicate(const ProfilePair& lhs, const ProfilePair
 	return lhs.second.count > rhs.second.count;
 }
 
+/* builds DFG from BB */
 DataFlowGraph ISEPass::dfgFromBasicBlock(const BasicBlock* bb)
 {
 	DataFlowGraph dfg(*bb);
@@ -135,15 +141,20 @@ void ISEPass::readProfilingInfo(Module &M)
 		ProfileInfoLoader PIL("ise", ISEProfInfoFilename, M);
 		if (PIL.hasAccurateBlockCounts())
 		{
+         /* the vector assosiates BB with the counter representing execution of BB */
 			typedef vector< pair<BasicBlock*, unsigned> > ProfileInfoVector;
 			ProfileInfoVector counts;
 			PIL.getBlockCounts(counts);
+
+         /* get total number of BB execution  */
 			double totalExecutions = 0;
 			for (ProfileInfoVector::const_iterator it = counts.begin();
 				it != counts.end(); ++it)
 			{
 				totalExecutions += it->second;
 			}
+
+         /* Assosiate BB with ExNum, Freq and store it as an list and hash */
 			for (ProfileInfoVector::const_iterator it = counts.begin();
 				it != counts.end(); ++it)
 			{
@@ -153,12 +164,18 @@ void ISEPass::readProfilingInfo(Module &M)
 			}
 		}
 	}
+
+   /* create artificial profiling stats */
 	if (profileList.size() == 0)
 	{
 		llvm::cerr << "WARNING: no profiling information found, assuming uniform distribution\n";
+
+      /* count the number of BB */
 		double bbc = 0;
 		for (Module::const_iterator I = M.begin(), E = M.end(); I != E; ++I)
 			bbc += I->size();
+
+      /* assume that each bb was executed once */
 		ProfileInfo info(1, 1.0f / bbc);
 		for (Module::const_iterator I = M.begin(), E = M.end(); I != E; ++I)
 			for (Function::const_iterator BB = I->begin(), E = I->end(); BB != E; ++BB)
@@ -204,6 +221,7 @@ IseAlgorithm* ISEPass::getIdentificationAlgorithm(void)
 	return new AlgoMaxMiso();
 }
 
+/* main - executed on every module */
 bool ISEPass::runOnModule(Module &M)
 {
 	readProfilingInfo(M);
@@ -215,29 +233,37 @@ bool ISEPass::runOnModule(Module &M)
 	string modName = M.getModuleIdentifier().substr(M.getModuleIdentifier().find_last_of("/\\") + 1);
 	if (ISEBenchmark)
 		llvm::cout << "#Nodes\tmsecs\n";
+
+   /* iterate over functions in module */
 	for (Module::const_iterator I = M.begin(), E = M.end(); I != E; ++I)
 	{
 		// ignore main function (mainly for our benchmarks)
 		if (I->getName().compare("main") == 0 && !ISEBenchmark) continue;
 		unsigned int nB = 0;
+
+      /* iterate over BB in function */
 		for (Function::const_iterator BB = I->begin(), E = I->end(); BB != E; ++BB, ++nB)
 		{
+         string IdentName = I->getName() + ":" + BB->getName();
 			// ignore basic blocks that have not been executed
 			if (profileMap.find(BB)->second.count == 0) continue;
+
+         /* Create DFG from BB  && associate both in a map*/
 			DataFlowGraph dfg = dfgFromBasicBlock(BB);
 			if (dfg.num_vertices() == 0) continue;
-			ResultVector resultVector;
 			dfgMap.insert(make_pair(BB, dfg));
+			llvm::cout << "Processing DFG(" << IdentName <<") with " << dfg.num_vertices() << " nodes.\t";
+
+         /* in order to find the condidates from given dfg run indefication algorithm 
+          * candidates =  dfg suitable for selection algorithm */
+			ResultVector candidateVector;
 			if (!ISEBenchmark)
 			{
-				llvm::cout << "Processing DFG with " << dfg.num_vertices() << " nodes\n";
-				algo->run(dfg, *arch, resultVector);
+				algo->run(dfg, *arch, candidateVector);
 			}
 			else
 			{
 				if (dfg.num_vertices() == 0) continue;
-				//llvm::cout << dfg.writeGraphviz(false);
-				//llvm::cout << "Processing DFG with " << dfg.num_vertices() << " nodes\n";
 				bool finished = false;
 				float time = 0.0f;
 				unsigned long benchCount = 1;
@@ -246,48 +272,59 @@ bool ISEPass::runOnModule(Module &M)
 				unsigned long ticks = 0, iterations = 0;
 				do
 				{
-					algo->run(dfg, *arch, resultVector, true);
-					resultVector.clear();
+					algo->run(dfg, *arch, candidateVector, true);
+					candidateVector.clear();
 					++iterations;
 					ticks = Benchmark::getTicks() - ticks_start;
 				} while (ticks < ISEBenchmarkTicks);
 				if (iterations == 1 && ticks < 20000)
 				{
 					unsigned long ticks_start2 = Benchmark::getTicks();
-					algo->run(dfg, *arch, resultVector, true);
-					resultVector.clear();
+					algo->run(dfg, *arch, candidateVector, true);
+					candidateVector.clear();
 					ticks = (ticks + (Benchmark::getTicks() - ticks_start2)) / 2;
 				}
 				time = static_cast<float>(ticks) / static_cast<float>(iterations);
-				/*
-				llvm::cout << "Processing DFG with " << dfg.num_vertices() <<
-					" nodes took " << time << " msecs\n";
-				*/
 				llvm::cout << time << "\n";
 			}
-			if (resultVector.size() > 0)
-				resultMap.insert(make_pair(BB, resultVector));
+
+         /* if candidates are found then store them in a map */
+			if (candidateVector.size() > 0)
+         {
+            llvm::cout << "- (different) candidate(s) found: " << candidateVector.size() << "\n";
+				resultMap.insert(make_pair(BB, candidateVector));
+         } else {
+            llvm::cout << "\n";
+         }
+
+         /* store to GraphViz files */
 			if (ISEOutputGraphs)
 			{
-				string blockName = modName + "_" + I->getName() + "_" + BB->getName() + "_" + Util::stringify(nB);
+            /* store whole DFG */
+				string blockName = modName + "_" + IdentName + "_" + Util::stringify(nB);
 				Util::dumpToFile(blockName + ".gv", dfg.writeGraphviz(true, true));
-				for (unsigned i = 0; i < resultVector.size(); ++i)
+
+            /* store candidates under *_cand_* name */
+				for (unsigned i = 0; i < candidateVector.size(); ++i)
 				{
 					string graphName = blockName + "_cand_" + Util::stringify(i) + ".gv";
 					Util::dumpToFile(graphName, DataFlowGraph(dfgMap.find(BB)->second, 
-						resultVector[i]).writeGraphviz(true));
+						candidateVector[i]).writeGraphviz(true));
 				}
 			}
 		}
 	}
+
 	if (ISEBenchmark)
 		llvm::cout << "#EOF\n";
 	delete algo;
+
 	// custom instruction selection
 	SelectionAlgorithm* selectAlgo = getSelectionAlgorithm();
 	ResultMap selected;
 	selectAlgo->run(profileList, resultMap, dfgMap, *arch, selected);
 	delete selectAlgo;
+
 	// replace selected DFGs
 	if (!ISEBenchmark)
 	{
@@ -314,6 +351,8 @@ bool ISEPass::runOnModule(Module &M)
 		}
 		llvm::cout << "Selected " << cur_udi << " templates\n";
 	}
+
+
 	/*
 		estimate runtime of whole program in pure software and with extended
 		instruction set
