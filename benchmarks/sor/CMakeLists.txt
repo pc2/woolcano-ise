@@ -53,8 +53,8 @@ set (o_file   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_ise.bc)
 #       -DPROF_FILE="${opt_file}" 
 #       -DO_FILE="${o_file}"
 #       -P ${LEVEL}/cmake/create_ise_pass_tests.cmake
-#   DEPENDS ${PROJECT_NAME}.bc ${PROJECT_NAME}_prof.out )
-# add_custom_target(${PROJECT_NAME}_ise ALL DEPENDS  sor_ise.bc)
+#   DEPENDS ${PROJECT_NAME}.bc ${PROJECT_NAME}_prof.out LLVMISEPass )
+# add_custom_target(${PROJECT_NAME}_ise ALL DEPENDS ${PROJECT_NAME}.bc ${PROJECT_NAME}_prof.out LLVMISEPass )
 
 
 add_custom_target( ${PROJECT_NAME}_ise
@@ -65,6 +65,6 @@ add_custom_target( ${PROJECT_NAME}_ise
        -DPROF_FILE="${opt_file}" 
        -DO_FILE="${o_file}"
        -P ${LEVEL}/cmake/create_ise_pass_tests.cmake
-   DEPENDS ${PROJECT_NAME}.bc ${PROJECT_NAME}_prof.out )
+   DEPENDS ${PROJECT_NAME}.bc ${PROJECT_NAME}_prof.out LLVMISEPass )
 
 add_dependencies(test_ise ${PROJECT_NAME}_ise)
