@@ -50,6 +50,7 @@ else(LLVM_OPT)
 endif(LLVM_OPT)
 
 
+
 # ======================================================
 # setup profiler
 
@@ -73,6 +74,7 @@ else()
   message(FATAL_ERROR "ERROR: Could not find profiler")
 endif()
 
+message("\n")
 
 # ======================================================
 # generates bc out of the source files
@@ -145,6 +147,7 @@ macro(target_link_bc_libraries t)
    add_custom_target(${t} ALL DEPENDS ${t_outfile})
    # assosiate target with output file
    set_target_properties(${t} PROPERTIES OUTPUT_NAME ${t_outfile})
+   set_directory_properties(${CMAKE_CURRENT_BINARY_DIR} ADDITIONAL_MAKE_CLEAN_FILES ${t_outfile})
 endmacro(target_link_bc_libraries)
 
 
@@ -188,10 +191,10 @@ endmacro(run_opt_file)
 macro(exec_opt o src dir)
   file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${dir})
   message("\n\nRunning opt \n===========")
-  message("WORKING_DIRECTORY: ${dir}/")
-  message("COMMAND ${LLVM_OPT} ${OPT_FLAGS} ${ARGN} -f -o ${o} ${src}\n")
+  message("WORKING_DIRECTORY: ${PROJECT_NAME}/${dir}/")
+  message(" COMMAND ${LLVM_OPT} ${OPT_FLAGS} -f -o ${o} ${src} ${ARGN}\n")
   execute_process(
-    COMMAND ${LLVM_OPT} ${OPT_FLAGS} ${ARGN} -f -o ${o} ${src}
+    COMMAND ${LLVM_OPT} ${OPT_FLAGS} -f -o ${o} ${src} ${ARGN}
     WORKING_DIRECTORY ${dir})
 endmacro(exec_opt src)
 
@@ -214,27 +217,40 @@ endmacro(run_opt)
 # params:  t       = target
 #          s       = bc_target (source)
 #          ${ARGN} = additional args for the running app = ./app ${ARGN}
-# output:  $t.prof, $t.prof_txt
+# output:  ${t}.out, ${t}.out_decoded_txt
+#
+# if ${ARGN} = "-stats"
+# output: ${t}.1_instr_txt ${t}.2_lli_txt   = stats 
 
-macro(run_prof t s)
+macro(run_prof t s stats)
    set(t_outfile     ${CMAKE_CURRENT_BINARY_DIR}/${t}.${PROF_SUFFIX})
-   set(t_outfile_txt ${CMAKE_CURRENT_BINARY_DIR}/${t}.${PROF_SUFFIX}_txt)
+   set(t_outfile_txt ${CMAKE_CURRENT_BINARY_DIR}/${t}.${PROF_SUFFIX}_decoded_txt)
+
+   # include this file to cleanup when profiler with stats was executed
+   if ("${stats}" STREQUAL "-stats")
+    set(t_prof  
+      ${CMAKE_CURRENT_BINARY_DIR}/${t}.1_instr_txt 
+      ${CMAKE_CURRENT_BINARY_DIR}/${t}.2_lli_txt)
+   else ("${stats}" STREQUAL "-stats")
+     set(t_prof "")
+   endif ("${stats}" STREQUAL "-stats")
+
    get_target_property(src ${s} OUTPUT_NAME)
 
    # profiler_generator
    add_custom_command(
-      OUTPUT  ${t_outfile} 
-      COMMAND ${LLVM_PROFILER} ${PROFILER_FLAGS} ${src} ${ARGN} > ${t_outfile_txt}
+      OUTPUT  ${t_outfile} ${t_outfile_txt} ${t_prof}
+      COMMAND ${LLVM_PROFILER} ${PROFILER_FLAGS} ${stats} -- ${src} ${ARGN} > ${t_outfile_txt}
       COMMAND mv llvmprof.out ${t_outfile}
       DEPENDS ${src}
    )
 
-   # register target and make dependency with the opt_generator 
-   add_custom_target(${t} ALL DEPENDS ${t_outfile})
+   # register target and make dependency with the profiler_generator 
+   add_custom_target(${t} DEPENDS ${t_outfile})
    # assosiate target with output file
    set_target_properties(${t} PROPERTIES OUTPUT_NAME ${t_outfile})
+
 
 endmacro(run_prof)
 
 # ======================================================
-

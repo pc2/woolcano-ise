@@ -1,0 +1,215 @@
+//===----------------------------------------------------------------------===//
+//                       CMake 
+//===----------------------------------------------------------------------===//
+
+The CMake is a bit cumbersome when one needs to do something a bit more advance.
+While it is possible to do it often the solution is not elegant.
+This is especially true when enabling other tool flow such as LLVM.
+
+One has to remember that CMake uses the configuraton files to generate Makefiles.
+However Makefiles itself are configuration files which allow to build programs
+and libraries in automated way.
+
+Therefor one has to keep in mind when writing CMakes what corresponds to the
+CMake domain and what to Makefile.
+
+Configuration file = scripting language code.
+
+//===----------------------------------------------------------------------===//
+// Targets
+//
+
+The so called "target" is the parameter for the make command: make xyz
+In such case the "xyz" represents the target. 
+
+We can create targets with CMake with these commands:
+* add_executable(), add_library(), add_test()
+* target_link_libraries()
+* add_custom_target()
+
+The most interesting command is the last one: add_custom_target()
+The command which will be executed for the target will be executed in bash
+shell (not CMake language). This means that one can not execute CMake
+statments with it.
+
+To write target which will run the CMake code one has to place the code in
+external file and call it like this:
+ add_custom_target(foo ${CMAKE_COMMAND} -P external.cmake)
+
+This will generate Makefile for which: 'make foo' command will run the
+CMake in script mode  and will execute the CMake code located in
+external.cmake file.
+
+Often we need to place some variable values to external.cmake.
+We can do that with preprocesor by creating defines like this:
+  add_custom_target( foo ${CMAKE_COMMAND} -DFOO=BAR -P external.cmake )
+or like this:
+  configure_file(external.cmake.in external.cmake)
+  add_custom_target( foo ${CMAKE_COMMAND} -P external.cmake )
+
+This command will parse the external.cmake.in file in order to find variable
+names and will change them with variable values. The output of this will be
+placed into the external.cmake file which will be used with target foo.
+
+add_custom_target() does not have notion of output file.
+Therefor it can't be used in dependencies with other targets.
+To overcome this one has to use the add_custom_command() in a such way:
+
+  add_custom_command(OUTPUT foo COMMAND touch foo)
+  add_custom_target(foo_t DEPENDS foo)
+
+The target (foo_t) has to be different than the OUTPUT (foo).
+It is not possible to have identical names. One can use this:
+  set_target_properties(foo_t PROPERTIES OUTPUT_NAME foo)
+
+and later reference to properties of the target like that:
+  get_target_property(var foo_t OUTPUT_NAME)
+
+The foo_t will be added to: 'make all' when  we write this in a such way:
+  add_custom_target(foo_t ALL DEPENDS foo)
+
+//===----------------------------------------------------------------------===//
+// Scope of variables and targets
+//
+
+Everything is global.
+It means that each target and variable has to be unique.
+These is also the case for add_subdirectories(foo).
+In such case the foo/CMakeLists.txt script will have access to the variables
+and targets from current scope.
+
+
+The variables do not propagate to the parents (I belive targets do).
+This means that variable created in foo/CMakeLists.txt will be not seen in
+current scope. However the target will.
+
+We can create target dependencies where each subdirectory will be connected to
+top target. assuming that we have main/a main/b main/c directories we can
+create target 'main_foo' for main and in each a, b, c subdirectories we can
+add dep to it. Like this:
+  add_dependencies(main_foo a) for main/a dir
+  add_dependencies(main_foo b) for main/b dir
+  add_dependencies(main_foo c) ..
+
+Now whenever: 'make main_foo' command will be executed it will be descended
+This allows for descendends to link to main_foo. The main_foo target does not
+have to know anything about subdirs - the programs & libraries located there
+can attach themselfs automatically to build process.
+
+
+//===----------------------------------------------------------------------===//
+// Shared build with CMake 
+//
+
+Sometimes we would like to share some of the Cmake configuration with other external targets.
+This is true when we would enable some functionality for the target depending
+on the existance of external target. Of course we could use the find_file()
+commands to figure out the existance of the external target but such approach
+will not always work well.
+
+To generate such configuration we can use:
+  execute_process(COMMAND echo set(foo bar) OUTPUT_FILE external.cmake)
+or
+  file(WRITE external.cmake "set(foo bar)"
+
+In both cases during execution of CMake both statements will generate
+external.cmake file with the set(foo bar) statment. This file can be later
+included by other targets.
+
+The execute_process() command executes only shell (sh) commands. It is not
+possible to use CMake scripting language commands in there.
+
+
+//===----------------------------------------------------------------------===//
+// Obtaining informations within external program
+//
+
+  execute_process(
+     COMMAND uname -a
+     OUTPUT_VARIABLE foo
+     OUTPUT_STRIP_TRAILING_WHITESPACES
+  )
+
+//===----------------------------------------------------------------------===//
+// Generating source code during building
+//
+
+  add_custom_command(
+    OUTPUT foo.c
+    COMMAND  ...
+    DEPENDS  ...
+  )
+  add_executable(foo foo.c)
+
+//===----------------------------------------------------------------------===//
+// Help
+//
+
+cmake --help
+cmake --help-command-list
+cmake --help-commands     
+cmake --help-command add_custom_target
+
+
+
+//===----------------------------------------------------------------------===//
+// Others
+//
+# include (${CMAKE_CURRENT_SOURCE_DIR}/../benchmarks/enable_llvm_toolflow.cmake)
+# add_opt_pass(${CMAKE_CURRENT_SOURCE_DIR}/../ise/lib/ISEPass/libLLVMISEPass.so)
+
+# execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/cos.txt ${CMAKE_CURRENT_BINARY_DIR}/cos.txt)
+
+# file(RELATIVE_PATH foo ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_LISSRC_FILE})
+
+# get the benchmarking apps list
+# set(bench_dir ${CMAKE_CURRENT_SOURCE_DIR}/../benchmarks)
+# file(GLOB inFiles ${bench_dir}/*)
+# foreach(entry ${inFiles})
+#   if(IS_DIRECTORY ${entry} AND EXISTS ${entry}/CMakeLists.txt)
+#     message(${entry})
+#    include (${entry}/CMakeLists.txt)
+#   endif()
+# endforeach(entry)
+
+
+# include ("${bench_dir}/adpcm/CMakeLists.txt")
+# get_target_property(foo libtiming OUTPUT_NAME)
+# message(${foo})
+
+#CONFIGURE_FILE(
+#  "${LEVEL}/cmake/create_ise_pass_tests.cmake.in"
+#  "${CMAKE_BINARY_DIR}/create_ise_pass_tests.cmake" 
+#  @ONLY)
+
+
+# 
+# 
+# # read path to pass from file generated by ise
+# if(EXISTS ${CMAKE_BINARY_DIR}/llvm_ise_pass_file.cmake)
+#   message("share_vars.cmake found")
+#   include (${CMAKE_BINARY_DIR}/llvm_ise_pass_file.cmake)
+#   if(${LLVM_ISE_PASS_FILE})
+# #    include("${LEVEL}/cmake/enable_ise_pass_tests.cmake")
+#     message(enabling: ${LLVM_ISE_PASS_fiLE})
+#     add_opt_pass(${LLVM_ISE_PASS_FILE})
+#     run_opt(sor_ise sor -ise -ise-output-graphs)
+#   endif(${LLVM_ISE_PASS_FILE})
+# else(EXISTS ${CMAKE_BINARY_DIR}/llvm_ise_pass_file.cmake)
+#   message("share_vars.cmake not found")
+# endif(EXISTS ${CMAKE_BINARY_DIR}/llvm_ise_pass_file.cmake)
+
+
+# =========================================================== #
+# This scripts launches opt with ise pass for given bc file
+# inputs are specified with the preprocessor (-DFOO=BAR)
+# params:
+#    LEVEL      = level to top dir
+#    BIN_DIR    = top binary dir
+#    SRC_FILE   = src input .bc file for opt
+#    PROF_FILE  = file with the profiling informations
+#    O_FILE     = output file
+
+# internal configuration
+#    working_directory = output directory for the pass
+

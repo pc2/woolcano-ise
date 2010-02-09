@@ -1,0 +1,25 @@
+//===----------------------------------------------------------------------===//
+//                        Profiling 
+//===----------------------------------------------------------------------===//
+
+profile.pl script does 3 things:
+1. instruments the code with profiling wrapper functions
+   this is done with help of (opt) tool and following passes:
+   -insert-block-profiling
+   -insert-edge-profiling
+   -insert-function-profiling
+
+   Input: target.bc
+   In our case it generates the output file: target.inst
+
+2. interpreter (lli) is used to gather runtime stats and to anotate the code
+   it uses the instrumented code from (1) and it generates the file:
+   target_prof.out
+
+3. decoder (llvm-prof) is used in order to obtain profiling informations
+   it works like this: llvm-prof target.bc target_prof.out
+   In our case it stores results to the target_prof.out_txt file.
+
+   This step is excluded from statistics while it is only optionally.
+
+4. remove target.inst file

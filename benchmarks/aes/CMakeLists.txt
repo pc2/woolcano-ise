@@ -23,25 +23,4 @@ add_bc_library(libaestab    aestab.c)
 # link both libraries to one
 target_link_bc_libraries(${PROJECT_NAME} libaes_modes libaes_test libaescrypt libaeskey libaestab)
 
-# ======================================================
-# run profiler
-run_prof(${PROJECT_NAME}_prof ${PROJECT_NAME})
-
-
-# ======================================================
-# execute external cmake file for this target
-# pass necessary variables as macros
-set (t_file   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.bc)
-set (opt_file ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_prof.out)
-set (o_file   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ise.bc)
-add_custom_target(${PROJECT_NAME}_ise 
-  ${CMAKE_COMMAND} 
-    -DLEVEL=${LEVEL} 
-    -DBIN_DIR="${CMAKE_BINARY_DIR}" 
-    -DSRC_FILE="${t_file}" 
-    -DPROF_FILE="${opt_file}" 
-    -DO_FILE="${o_file}"
-    -P ${LEVEL}/cmake/create_ise_pass_tests.cmake
-   DEPENDS ${PROJECT_NAME}.bc ${PROJECT_NAME}_prof.out LLVMISEPass )
-
-add_dependencies(test_ise ${PROJECT_NAME}_ise)
+include (${LEVEL}/cmake/enable_ise_targets.cmake)

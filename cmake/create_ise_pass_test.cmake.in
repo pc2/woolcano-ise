@@ -1,9 +1,19 @@
+set(PROJECT_NAME  "@PROJECT_NAME@")
+set(LEVEL         "@LEVEL@")
+set(BIN_DIR       "@CMAKE_BINARY_DIR@")
+set(WRK_DIR       "@WRK_DIR@")
+
+set(SRC_FILE      "@src_file@")
+set(PROF_FILE     "@opt_file@")
+set(DST_FILE        "@dst_file@")
+
+set(OPT_PASS_ARGS      "@OPT_PASS_ARGS@")
 
 # =========================================================== #
 # 0. check if proper params are given
 FILE(RELATIVE_PATH THIS_FILE ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_LIST_FILE})
 message("\n=====================================================")
-message("* Executing ${THIS_FILE}")
+message("* Executing ${PROJECT_NAME}/${THIS_FILE}")
 message("=====================================================\n")
 
 if (NOT EXISTS ${SRC_FILE})
@@ -43,7 +53,11 @@ endif (EXISTS ${f_llvm})
 
 # =========================================================== #
 # 3. run ise_pass on app
-set(working_dir "test_ise")
+message(STATUS "Selecting MaxMiso as identification algorithm")
+message(STATUS "Selecting Virtex architecture")
+
 add_opt_pass(${LLVM_ISE_PASS_FILE})
-exec_opt(${O_FILE} ${SRC_FILE} ${working_dir}
-  -ise -ise-output-graphs -ise-profile-info-file ${PROF_FILE})
+  exec_opt(${DST_FILE} ${SRC_FILE} ${WRK_DIR}
+   -ise -ise-architecture=virtex -ise-output-graphs -ise-profile-info-file ${PROF_FILE}
+   ${OPT_PASS_ARGS} )
+

@@ -1,0 +1,58 @@
+//===----------------------------------------------------------------------===//
+//                        Running the code
+//===----------------------------------------------------------------------===//
+
+At first type:
+  cd woolcano-ise
+  mkdir build && cd build && cmake ..
+
+To compile everything, run the ISE on each app and gather stats:
+  make test_ise_stats
+
+To do the same as above but without stats:
+  make test_ise
+
+To benchmark ISE algos on all apps:
+  make test_ise_bench
+
+//===----------------------------------------------------------------------===//
+// Working with apps
+//
+
+cd benchmarks/sor
+
+make                = will use LLVM toolflow to compile app
+                      output: sor.bc
+
+make sor_prof       = will run profiler
+                      output: sor_prof.out                    * annotated code
+                              sor_prof.decoded_txt            * results
+
+make sor_prof_stats = will run profiler with stats
+                      output: sor_prof_stats.out              * annotated code
+                              sor_prof_stats.out_decoded_txta * results
+                              sor_prof_stats.1_instr_txt      * stats file
+                              sor_prof_stats.2_lli_txt        * stats file
+
+make sor_ise        = will run the ISE pass on app
+                      output: sor_ise.bc                      * with udis
+                              sor_ise/                        * dir with candidates
+
+make sor_ise_stats = will run the ISE pass on app and will gather time and memory stats
+                      output: sor_ise_stats.bc                * with udis
+                              sor_ise_stats.bc.txt            * stats file
+                              sor_ise_stats/                  * dir with candidates
+
+make sor_ise_bench = will run the ISE pass in order to benchmark the ISE algos
+                      output: sor_ise_bench.bc                * with udis
+                              sor_ise_bench/                  * dir with candidates
+
+
+//===----------------------------------------------------------------------===//
+// Single app
+//
+
+The CMake's are written in a way which allow to compile single app only.
+  cd woolcano-ise
+  mkdir b-sor && cd b-sor && cmake ../benchmark/sor
+  make sor_ise_stats

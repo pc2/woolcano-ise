@@ -5,8 +5,13 @@ The CMake build system is preffered.
 To compile the benchmarking apps type the following:
 ( mkdir build && cd build && cmake .. && make -j2)
 This will build up the sources (in build/).
-In addition it will use profiler to profile them.
+
 The main application has always the same name as directory_name under which it is located.
+
+Profiling applications
+=========================
+
+In addition it will use profiler to profile them.
 The profiling results are stored into the <directory_name>_prof.bc
 
 To get profiling results under the automake use the ./profile_all.pl script.
