@@ -1,0 +1,9 @@
+.DS_Store
+*.guess
+*.bak
+*.log
+*cache
+*.swp
+Debug/
+config.*
+tags
