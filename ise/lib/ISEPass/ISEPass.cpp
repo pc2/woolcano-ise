@@ -276,7 +276,7 @@ bool ISEPass::runOnModule(Module &M)
       /* iterate over BB in function */
 		for (Function::const_iterator BB = I->begin(), E = I->end(); BB != E; ++BB, ++nB)
 		{
-         string IdentName = I->getName() + ":" + BB->getName();
+         string IdentName = I->getName() + "-" + BB->getName();
 			// ignore basic blocks that have not been executed
 			if (profileMap.find(BB)->second.count == 0) continue;
 
@@ -333,15 +333,20 @@ bool ISEPass::runOnModule(Module &M)
          /* store to GraphViz files */
 			if (ISEOutputGraphs)
 			{
-            /* store whole DFG */
-				string blockName = modName + "_" + IdentName + "_" + Util::stringify(nB);
-				Util::dumpToFile(blockName + ".gv", dfg.writeGraphviz(true, true));
+        /* store whole DFG */
+				// string blockName = modName + "_" + IdentName + "_" + Util::stringify(nB);
+				string blockName = IdentName + "_" + Util::stringify(nB);
+				Util::dumpToFile(blockName + ".gv", dfg.writeGraphviz(false,true));
 
-            /* store candidates under *_cand_* name */
+        /* store candidates under *_cand_* name */
 				for (unsigned i = 0; i < candidateVector.size(); ++i)
-				{
-					string graphName = blockName + "_cand_" + Util::stringify(i) + ".gv";
-					Util::dumpToFile(graphName, DataFlowGraph(dfgMap.find(BB)->second, 
+        {
+
+          string graphName = blockName + "_cand_" + Util::stringify(i) + ".gv";
+					Util::dumpToFile(graphName, dfg.writeGraphviz2(false,false,
+                candidateVector[i], *arch));
+
+          Util::appendToFile("_"+graphName, DataFlowGraph(dfgMap.find(BB)->second, 
 						candidateVector[i]).writeGraphviz(true));
 				}
 			}

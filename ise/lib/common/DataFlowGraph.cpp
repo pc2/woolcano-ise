@@ -286,7 +286,7 @@ string DataFlowGraph::writeGraphviz(bool outputCode, bool outputTopo) const
 		for (unsigned int i = 0; i < topo.size(); i++)
 			topoVector[topo[i]] = i;
 	}
-	string result = "digraph G {\n";
+	string result = "digraph G {\nsize = \"8.3,11.7\"; //a4 size\n";
 	// output all nodes
 	DFG::vertex_iterator vIt, vItEnd;
 	tie(vIt, vItEnd) = vertices();
@@ -308,6 +308,7 @@ string DataFlowGraph::writeGraphviz(bool outputCode, bool outputTopo) const
 		}
 		else
 			result += value->getName();
+
 		if (outputTopo)
 			result += "(" + Util::stringify(topoVector[*vIt]) + ")";
 		result += "\" ";
@@ -379,6 +380,162 @@ string DataFlowGraph::writeGraphviz(bool outputCode, bool outputTopo) const
 	return result;
 }
 
+string DataFlowGraph::writeGraphviz2(bool outputCode, bool outputTopo, 
+    BitVector &bv, const Architecture &arch) const
+{
+
+  // annotate graph with topoological order
+	std::vector<unsigned int> topoVector;
+	if (outputTopo)
+	{
+		VertexVector topo = reverseTopologicalSort();
+		topoVector.resize(topo.size());
+		for (unsigned int i = 0; i < topo.size(); i++)
+			topoVector[topo[i]] = i;
+	}
+	string result = "digraph G {\nsize = \"8.3,11.7\"; //a4 size\n";
+
+	// output all nodes
+	DFG::vertex_iterator vIt, vItEnd;
+	tie(vIt, vItEnd) = vertices();
+  for (; vIt != vItEnd; ++vIt)
+	{
+		// label
+		size_t idx = index[*vIt];
+		result += "node_" + Util::stringify(idx) + " [ label = \"";
+		const llvm::Value* value = g[*vIt].value;
+		if (isa<Instruction>(value))
+		{
+			const Instruction* inst = cast<Instruction>(value);
+			result += inst->getOpcodeName();
+		}
+		else if (isa<Constant>(value))
+		{
+			const Constant* c = cast<Constant>(value);
+			result += "constant";
+		}
+		else
+			result += value->getName();
+
+		if (outputTopo)
+			result += "(" + Util::stringify(topoVector[*vIt]) + ")";
+		result += "\" ";
+		// shape and rank
+		operator_t type = g[*vIt].op;
+		switch (type)
+		{
+		case INPUT:
+			result += "shape = \"invhouse\" rank = \"source\"";
+			break;
+		case OUTPUT:
+			result += "shape = \"doublecircle\" rank = \"sink\"";
+			break;
+		case OPERATOR:
+			result += "shape = \"circle\"";
+			break;
+		case CONSTANT:
+			result += "shape = \"diamond\"";
+			break;
+		default:
+			break;
+		}
+
+		// change colors for nodes located in bv
+    if (bv[*vIt]) 
+        result += " style = \"filled\" color = \"lightblue\" ";
+
+    result += "];\n";
+		if (outputCode)
+		{
+			std::ostringstream os;
+			result += "/* ";
+//			os << *value << "*/\n";
+			os << *value; 
+      std::string t = os.str();
+      if (t[t.size()] = '\n')
+        t.resize(t.size()-1);
+			result += t + " */\n";
+		}
+	}
+
+	// output all edges
+	DFG::edge_iterator eIt, eItEnd;
+	tie(eIt, eItEnd) = boost::edges(g);
+  std::ostringstream mark_src_nodes;
+  for (; eIt != eItEnd; ++eIt)
+	{
+		Vertex source = boost::source(*eIt, g);
+		size_t idxS = index[source];
+		Vertex target = boost::target(*eIt, g);
+		size_t idxT = index[target];
+		result += "node_" + Util::stringify(idxS);
+		result += " -> ";
+		result += "node_" + Util::stringify(idxT);
+
+		result += " [ fontsize = 10 label = \"";
+		const llvm::Value* value = g[source].value;
+    if (isa<Instruction>(value)) {
+      const llvm::Instruction *inst = cast<Instruction>(value);
+      result += "sw:" +Util::stringify(arch.getSwInstructionTiming(inst)) + "\\n";
+    } else if (isa<Constant>(value)) {
+      result += "sw: 0\\n";
+    }
+		result += value->getType()->getDescription() + "\" ";
+
+    // mark all edges going to bv
+    if (bv[idxT] || bv[idxS]  ) {
+      result += " color = \"blue\"";
+
+      // when source node is not there mark it aswell
+      if (! bv[idxS])
+        mark_src_nodes << "node_" << idxS << " [ shape = \"invhouse\" \
+        rank = \"source\" style = \"filled\" bgcolor = \"lightblue\" ];\n";
+    }
+		result += " ];\n";
+	}
+
+  // add marked nodes
+  if (mark_src_nodes)
+    result += "\n\n/* Additional source nodes */\n" + mark_src_nodes.str();
+
+	result += "}\n";
+#if 0
+	if (outputCode)
+	{
+		result += "/*\n";
+		VertexVector topo = topologicalSort();
+		std::ostringstream os;
+		for (VertexVector::const_reverse_iterator topoIt = topo.rbegin(); topoIt != topo.rend();
+			++topoIt)
+		{
+			if (g[*topoIt].op != INPUT)
+			{
+				const llvm::Value* value = g[*topoIt].value;
+				os << *value << "\n";
+			}
+		}
+		result += os.str();
+		result += "*/\n";
+	}
+#endif
+	return result;
+}
+std::string DataFlowGraph::writeGraphviz(const BitVector &bv) const
+{
+  // create base dfg graph and remove from it the last line with '}' 
+  std::string base_dfg = writeGraphviz(false,true);
+  base_dfg.resize(base_dfg.size() - 2 );
+
+  BitVector::size_type i;
+  for (i = bv.find_first(); i != BitVector::npos; i = bv.find_next(i)) 
+  {
+    base_dfg += "node_" + Util::stringify(index[i]) + " [ color = \"lightblue\";\n";
+//    cout << idx << getValue[i].getName() << "\n"; 
+  }
+  base_dfg += "}\n";
+
+  return base_dfg;
+}
 /*
     creates a DFG from a subgraph defined by a bitvector
 */
@@ -394,7 +551,7 @@ void DataFlowGraph::fromBitVector(const DataFlowGraph &dfg, const BitVector &bv)
 	for (BitVector::size_type i = bv.find_first();
 		i != BitVector::npos; i = bv.find_next(i))
 	{
-        // outgoing edges first, set output nodes accordingly
+    // outgoing edges first, set output nodes accordingly
 		DataFlowGraph::DFG::out_edge_iterator edgeIt, edgeItEnd;
 		tie(edgeIt, edgeItEnd) = dfg.out_edges(i);
 		operator_t type = dfg.getType(i);

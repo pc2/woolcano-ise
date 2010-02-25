@@ -30,6 +30,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace std;
 
+void Util::appendToFile(const std::string &filename, const std::string &contents)
+{
+	ofstream file(filename.c_str(), ios::app);
+	if (!file.bad())
+	{
+		file << contents;
+		file.close();
+	}
+}
+
 void Util::dumpToFile(const std::string &filename, const std::string &contents)
 {
 	ofstream file(filename.c_str());
