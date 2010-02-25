@@ -380,10 +380,8 @@ string DataFlowGraph::writeGraphviz(bool outputCode, bool outputTopo) const
 	return result;
 }
 
-string DataFlowGraph::writeGraphviz2(bool outputCode, bool outputTopo, 
-    BitVector &bv, const Architecture &arch) const
+string DataFlowGraph::writeGraphviz2(bool outputCode, bool outputTopo, const BitVector &bv, const Architecture &arch, const std::string &dot_code) const
 {
-
   // annotate graph with topoological order
 	std::vector<unsigned int> topoVector;
 	if (outputTopo)
@@ -394,6 +392,8 @@ string DataFlowGraph::writeGraphviz2(bool outputCode, bool outputTopo,
 			topoVector[topo[i]] = i;
 	}
 	string result = "digraph G {\nsize = \"8.3,11.7\"; //a4 size\n";
+  if (! dot_code.empty()) 
+    result += dot_code;
 
 	// output all nodes
 	DFG::vertex_iterator vIt, vItEnd;
@@ -441,8 +441,16 @@ string DataFlowGraph::writeGraphviz2(bool outputCode, bool outputTopo,
 		}
 
 		// change colors for nodes located in bv
-    if (bv[*vIt]) 
-        result += " style = \"filled\" color = \"lightblue\" ";
+    if (bv[*vIt]) {
+      // when it is constant than mark is as template input
+      if (isa<Constant>(value)) {
+        result += " shape = \"invhouse\" rank = \"source\" style = \"filled\" \
+                   bgcolor = \"lightblue\" " ;
+      } else {
+        // mark nodes which belong to template
+         result += " style = \"filled\" color = \"lightblue\" ";
+      }
+    }
 
     result += "];\n";
 		if (outputCode)
@@ -484,12 +492,19 @@ string DataFlowGraph::writeGraphviz2(bool outputCode, bool outputTopo,
 
     // mark all edges going to bv
     if (bv[idxT] || bv[idxS]  ) {
-      result += " color = \"blue\"";
 
-      // when source node is not there mark it aswell
-      if (! bv[idxS])
-        mark_src_nodes << "node_" << idxS << " [ shape = \"invhouse\" \
-        rank = \"source\" style = \"filled\" bgcolor = \"lightblue\" ];\n";
+      // when source node is not in bv than mark is as input to the template
+      if (! bv[idxS]) {
+        mark_src_nodes << "node_" << idxS << " [ shape = \"invhouse\" rank = \"source\" style = \"filled\" bgcolor = \"lightblue\" ];\n";
+        result += " color = \"gray\" label = \"\"";
+      } else {
+        if (isa<Constant>(value)) {
+          result += " color = \"gray\" label = \"\"";
+        } else {
+          // edge counted in estimation
+          result += " fontcolor = \"blue\" color = \"lightblue\" " ;
+        }
+      }
     }
 		result += " ];\n";
 	}

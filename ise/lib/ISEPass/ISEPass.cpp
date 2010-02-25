@@ -64,7 +64,7 @@ static cl::opt<bool> ISERuntimeEstimation("ise-runtime-estimation");
 static cl::opt<unsigned int> ISEBenchmarkTicks("ise-benchmark-ticks", 
     cl::init(2500));
 
-static cl::opt<string> ISEArchitecture("ise-architecture", cl::init("virtual"),
+static cl::opt<string> ISEArchitecture("ise-architecture", cl::init("virtex"),
     cl::value_desc("architecture"),
     cl::desc("Select ISE target architecture: virtual (def.), virtex"));
 
@@ -218,7 +218,7 @@ void ISEPass::readProfilingInfo(Module &M)
 Architecture* ISEPass::getArchitecture(void)
 {
 	string architecture = ISEArchitecture;
-  llvm::cout << "Selected architecture: " << architecture << "\n";
+  llvm::cout << "\nSelected architecture: " << architecture << "\n";
 	if (architecture.compare("virtex") == 0)
 		return new ArchitectureVirtexFx();
 	else if (architecture.compare("virtual") != 0)
@@ -229,7 +229,7 @@ Architecture* ISEPass::getArchitecture(void)
 SelectionAlgorithm* ISEPass::getSelectionAlgorithm(void)
 {
 	string algorithm = ISESelAlgorithm;
-  llvm::cout << "Selection algorithm: " << algorithm<< "\n";
+  llvm::cout << "\nSelection algorithm: " << algorithm<< "\n";
 	if (algorithm.compare("random") == 0)
 		return new SelectionRandom();
 	else if (algorithm.compare("method1") != 0)
@@ -240,7 +240,7 @@ SelectionAlgorithm* ISEPass::getSelectionAlgorithm(void)
 IseAlgorithm* ISEPass::getIdentificationAlgorithm(void)
 {
 	string algorithm = ISEAlgorithm;
-  llvm::cout << "Identification algorithm: " << algorithm<< "\n";
+  llvm::cout << "\nIdentification algorithm: " << algorithm<< "\n";
 	if (algorithm.compare("singlecut") == 0)
 		return new AlgoSingleCut();
 	else if (algorithm.compare("multicut") == 0)
@@ -326,11 +326,13 @@ bool ISEPass::runOnModule(Module &M)
 
       /* if candidates are found then store them in a map */
       if (candidateVector.size() > 0)
-      {
+     {
+//        std::cout << "# storing " << IdentName << " with candidateVector.size()\
+//         = " << candidateVector.size() << "\n";
         resultMap.insert(make_pair(BB, candidateVector));
       } 
 
-         /* store to GraphViz files */
+      /* store to GraphViz files */
 			if (ISEOutputGraphs)
 			{
         /* store whole DFG */
@@ -342,12 +344,12 @@ bool ISEPass::runOnModule(Module &M)
 				for (unsigned i = 0; i < candidateVector.size(); ++i)
         {
 
-          string graphName = blockName + "_cand_" + Util::stringify(i) + ".gv";
-					Util::dumpToFile(graphName, dfg.writeGraphviz2(false,false,
-                candidateVector[i], *arch));
+//          string graphName = blockName + "_cand_" + Util::stringify(i) + ".gv";
+//					Util::dumpToFile(graphName, dfg.writeGraphviz2(false,false,
+//                candidateVector[i], *arch));
 
-          Util::appendToFile("_"+graphName, DataFlowGraph(dfgMap.find(BB)->second, 
-						candidateVector[i]).writeGraphviz(true));
+//          Util::appendToFile("_"+graphName, DataFlowGraph(dfgMap.find(BB)->second, 
+//						candidateVector[i]).writeGraphviz(true));
 				}
 			}
 		}
@@ -357,6 +359,16 @@ bool ISEPass::runOnModule(Module &M)
 		llvm::cout << "#EOF\n";
 	delete algo;
 
+#if 0
+/* iteratre over resultMap */
+  std::cout << "Size: " << resultMap.size() << "\n";
+  for (ResultMap::iterator it = resultMap.begin(); it != resultMap.end(); it ++) {
+    const llvm::BasicBlock *bb = it->first;
+    ResultVector &cand = it->second;
+    std::cout << "# " << bb->getName() << " " << cand.size() << "\n";
+  }
+#endif
+  
 	// custom instruction selection
 	SelectionAlgorithm* selectAlgo = getSelectionAlgorithm();
 	ResultMap selected;

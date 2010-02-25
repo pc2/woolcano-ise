@@ -95,8 +95,8 @@ public:
 	double getWeight(const Edge &e) const { return g[e].weight; }
 	std::string writeGraphviz(const BitVector &bv) const;
 	std::string writeGraphviz(bool outputCode = false, bool outputTopo = false) const;
-	std::string writeGraphviz2(bool outputCode = false, bool outputTopo = 
-      false, BitVector &bv = 0, const Architecture &arch = 0 ) const;
+  std::string writeGraphviz2(bool outputCode = false, bool outputTopo = false,
+      const BitVector &bv = 0, const Architecture &arch = 0, const std::string &dot_code = 0 ) const;
 	void splitConstants(void);
 	DataFlowGraph(const llvm::BasicBlock &bb);
 	DataFlowGraph(const DataFlowGraph &dfg, const BitVector &bv);
