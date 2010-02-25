@@ -1,0 +1,21 @@
+digraph G {
+size = "8.3,11.7"; //a4 size
+label = "profile: [0.00%] SOR_execute.entry\n- cand_2.gv: 	   3 nodes 	 inputs:   1 	 sw:   1 	 hw:   5[comm:   4] 	 ratio: 0.20 	 not selected"
+node_0 [ label = "mul" shape = "doublecircle" rank = "sink"];
+node_1 [ label = "omega" shape = "invhouse" rank = "source"];
+node_2 [ label = "constant" shape = "diamond"];
+node_3 [ label = "sub" shape = "doublecircle" rank = "sink"];
+node_4 [ label = "constant" shape = "diamond"];
+node_5 [ label = "icmp" shape = "doublecircle" rank = "sink" style = "filled" color = "lightblue" ];
+node_6 [ label = "num_iterations" shape = "invhouse" rank = "source" style = "filled" color = "lightblue" ];
+node_7 [ label = "constant" shape = "diamond" shape = "invhouse" rank = "source" style = "filled"                    bgcolor = "lightblue" ];
+node_1 -> node_0 [ fontsize = 10 label = "double"  ];
+node_2 -> node_0 [ fontsize = 10 label = "sw: 0\ndouble"  ];
+node_4 -> node_3 [ fontsize = 10 label = "sw: 0\ndouble"  ];
+node_1 -> node_3 [ fontsize = 10 label = "double"  ];
+node_6 -> node_5 [ fontsize = 10 label = "i32"  fontcolor = "blue" color = "lightblue"  ];
+node_7 -> node_5 [ fontsize = 10 label = "sw: 0\ni32"  color = "gray" label = "" ];
+
+
+/* Additional source nodes */
+}

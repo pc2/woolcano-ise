@@ -1,0 +1,76 @@
+digraph G {
+size = "8.3,11.7"; //a4 size
+label = "profile: [0.50%] main.bb2.i\n- cand_2.gv: 	   8 nodes 	 inputs:   5 	 sw: 448 	 hw:  13[comm:   8] 	 ratio: 34.46 	 selected"
+node_0 [ label = "phi" shape = "invhouse" rank = "source"];
+node_1 [ label = "add" shape = "doublecircle" rank = "sink"];
+node_2 [ label = "constant" shape = "diamond"];
+node_3 [ label = "getelementptr" shape = "circle"];
+node_4 [ label = "load" shape = "invhouse" rank = "source"];
+node_5 [ label = "getelementptr" shape = "circle"];
+node_6 [ label = "load" shape = "invhouse" rank = "source"];
+node_7 [ label = "getelementptr" shape = "circle"];
+node_8 [ label = "load" shape = "invhouse" rank = "source"];
+node_9 [ label = "add" shape = "circle"];
+node_10 [ label = "constant" shape = "diamond"];
+node_11 [ label = "getelementptr" shape = "circle"];
+node_12 [ label = "getelementptr" shape = "circle"];
+node_13 [ label = "load" shape = "circle"];
+node_14 [ label = "load" shape = "circle"];
+node_15 [ label = "add" shape = "circle" style = "filled" color = "lightblue" ];
+node_16 [ label = "load" shape = "circle"];
+node_17 [ label = "add" shape = "circle" style = "filled" color = "lightblue" ];
+node_18 [ label = "load" shape = "circle"];
+node_19 [ label = "add" shape = "circle" style = "filled" color = "lightblue" ];
+node_20 [ label = "mul" shape = "circle" style = "filled" color = "lightblue" ];
+node_21 [ label = "constant" shape = "diamond" shape = "invhouse" rank = "source" style = "filled"                    bgcolor = "lightblue" ];
+node_22 [ label = "load" shape = "circle"];
+node_23 [ label = "mul" shape = "circle" style = "filled" color = "lightblue" ];
+node_24 [ label = "constant" shape = "diamond" shape = "invhouse" rank = "source" style = "filled"                    bgcolor = "lightblue" ];
+node_25 [ label = "add" shape = "circle" style = "filled" color = "lightblue" ];
+node_26 [ label = "store" shape = "doublecircle" rank = "sink"];
+node_27 [ label = "icmp" shape = "doublecircle" rank = "sink"];
+node_28 [ label = "constant" shape = "diamond"];
+node_0 -> node_1 [ fontsize = 10 label = "sw:1\ni32"  ];
+node_2 -> node_1 [ fontsize = 10 label = "sw: 0\ni32"  ];
+node_4 -> node_3 [ fontsize = 10 label = "sw:2\ndouble*"  ];
+node_1 -> node_3 [ fontsize = 10 label = "sw:1\ni32"  ];
+node_6 -> node_5 [ fontsize = 10 label = "sw:2\ndouble*"  ];
+node_1 -> node_5 [ fontsize = 10 label = "sw:1\ni32"  ];
+node_8 -> node_7 [ fontsize = 10 label = "sw:2\ndouble*"  ];
+node_1 -> node_7 [ fontsize = 10 label = "sw:1\ni32"  ];
+node_0 -> node_9 [ fontsize = 10 label = "sw:1\ni32"  ];
+node_10 -> node_9 [ fontsize = 10 label = "sw: 0\ni32"  ];
+node_8 -> node_11 [ fontsize = 10 label = "sw:2\ndouble*"  ];
+node_9 -> node_11 [ fontsize = 10 label = "sw:1\ni32"  ];
+node_8 -> node_12 [ fontsize = 10 label = "sw:2\ndouble*"  ];
+node_0 -> node_12 [ fontsize = 10 label = "sw:1\ni32"  ];
+node_3 -> node_13 [ fontsize = 10 label = "sw:1\ndouble*"  ];
+node_5 -> node_14 [ fontsize = 10 label = "sw:1\ndouble*"  ];
+node_13 -> node_15 [ fontsize = 10 label = "sw:2\ndouble"  color = "gray" label = "" ];
+node_14 -> node_15 [ fontsize = 10 label = "sw:2\ndouble"  color = "gray" label = "" ];
+node_12 -> node_16 [ fontsize = 10 label = "sw:1\ndouble*"  ];
+node_15 -> node_17 [ fontsize = 10 label = "sw:61\ndouble"  fontcolor = "blue" color = "lightblue"  ];
+node_16 -> node_17 [ fontsize = 10 label = "sw:2\ndouble"  color = "gray" label = "" ];
+node_11 -> node_18 [ fontsize = 10 label = "sw:1\ndouble*"  ];
+node_17 -> node_19 [ fontsize = 10 label = "sw:61\ndouble"  fontcolor = "blue" color = "lightblue"  ];
+node_18 -> node_19 [ fontsize = 10 label = "sw:2\ndouble"  color = "gray" label = "" ];
+node_19 -> node_20 [ fontsize = 10 label = "sw:61\ndouble"  fontcolor = "blue" color = "lightblue"  ];
+node_21 -> node_20 [ fontsize = 10 label = "sw: 0\ndouble"  color = "gray" label = "" ];
+node_7 -> node_22 [ fontsize = 10 label = "sw:1\ndouble*"  ];
+node_22 -> node_23 [ fontsize = 10 label = "sw:2\ndouble"  color = "gray" label = "" ];
+node_24 -> node_23 [ fontsize = 10 label = "sw: 0\ndouble"  color = "gray" label = "" ];
+node_20 -> node_25 [ fontsize = 10 label = "sw:102\ndouble"  fontcolor = "blue" color = "lightblue"  ];
+node_23 -> node_25 [ fontsize = 10 label = "sw:102\ndouble"  fontcolor = "blue" color = "lightblue"  ];
+node_25 -> node_26 [ fontsize = 10 label = "sw:61\ndouble"  fontcolor = "blue" color = "lightblue"  ];
+node_7 -> node_26 [ fontsize = 10 label = "sw:1\ndouble*"  ];
+node_1 -> node_27 [ fontsize = 10 label = "sw:1\ni32"  ];
+node_28 -> node_27 [ fontsize = 10 label = "sw: 0\ni32"  ];
+
+
+/* Additional source nodes */
+node_13 [ shape = "invhouse" rank = "source" style = "filled" bgcolor = "lightblue" ];
+node_14 [ shape = "invhouse" rank = "source" style = "filled" bgcolor = "lightblue" ];
+node_16 [ shape = "invhouse" rank = "source" style = "filled" bgcolor = "lightblue" ];
+node_18 [ shape = "invhouse" rank = "source" style = "filled" bgcolor = "lightblue" ];
+node_22 [ shape = "invhouse" rank = "source" style = "filled" bgcolor = "lightblue" ];
+}
