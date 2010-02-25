@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/graph/adjacency_list.hpp>
 #include <llvm/Value.h>
 #include "Types.h"
+#include "Architecture.h"
 
 class DataFlowGraph
 {
@@ -92,7 +93,10 @@ public:
 	operator_t getType(const Vertex &v) const { return g[v].op; }
 	void setType(const Vertex &v, operator_t type) { g[v].op = type; }
 	double getWeight(const Edge &e) const { return g[e].weight; }
+	std::string writeGraphviz(const BitVector &bv) const;
 	std::string writeGraphviz(bool outputCode = false, bool outputTopo = false) const;
+  std::string writeGraphviz2(bool outputCode = false, bool outputTopo = false,
+      const BitVector &bv = 0, const Architecture &arch = 0, const std::string &dot_code = 0 ) const;
 	void splitConstants(void);
 	DataFlowGraph(const llvm::BasicBlock &bb);
 	DataFlowGraph(const DataFlowGraph &dfg, const BitVector &bv);

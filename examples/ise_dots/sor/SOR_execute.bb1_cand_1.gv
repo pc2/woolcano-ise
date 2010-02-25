@@ -1,0 +1,38 @@
+digraph G {
+size = "8.3,11.7"; //a4 size
+label = "profile: [0.00%] SOR_execute.bb1\n- cand_1.gv: 	   2 nodes 	 inputs:   1 	 sw:   1 	 hw:   5[comm:   4] 	 ratio: 0.20 	 not selected"
+node_0 [ label = "phi" shape = "invhouse" rank = "source"];
+node_1 [ label = "add" shape = "circle"];
+node_2 [ label = "constant" shape = "diamond"];
+node_3 [ label = "getelementptr" shape = "circle"];
+node_4 [ label = "G" shape = "invhouse" rank = "source"];
+node_5 [ label = "add" shape = "doublecircle" rank = "sink" style = "filled" color = "lightblue" ];
+node_6 [ label = "constant" shape = "diamond" shape = "invhouse" rank = "source" style = "filled"                    bgcolor = "lightblue" ];
+node_7 [ label = "getelementptr" shape = "circle"];
+node_8 [ label = "getelementptr" shape = "circle"];
+node_9 [ label = "load" shape = "doublecircle" rank = "sink"];
+node_10 [ label = "load" shape = "doublecircle" rank = "sink"];
+node_11 [ label = "load" shape = "doublecircle" rank = "sink"];
+node_12 [ label = "add" shape = "doublecircle" rank = "sink"];
+node_13 [ label = "N" shape = "invhouse" rank = "source"];
+node_14 [ label = "constant" shape = "diamond"];
+node_0 -> node_1 [ fontsize = 10 label = "sw:1\ni32"  ];
+node_2 -> node_1 [ fontsize = 10 label = "sw: 0\ni32"  ];
+node_4 -> node_3 [ fontsize = 10 label = "double**"  ];
+node_1 -> node_3 [ fontsize = 10 label = "sw:1\ni32"  ];
+node_0 -> node_5 [ fontsize = 10 label = "sw:1\ni32"  color = "gray" label = "" ];
+node_6 -> node_5 [ fontsize = 10 label = "sw: 0\ni32"  color = "gray" label = "" ];
+node_4 -> node_7 [ fontsize = 10 label = "double**"  ];
+node_5 -> node_7 [ fontsize = 10 label = "sw:1\ni32"  fontcolor = "blue" color = "lightblue"  ];
+node_4 -> node_8 [ fontsize = 10 label = "double**"  ];
+node_0 -> node_8 [ fontsize = 10 label = "sw:1\ni32"  ];
+node_7 -> node_9 [ fontsize = 10 label = "sw:1\ndouble**"  ];
+node_8 -> node_10 [ fontsize = 10 label = "sw:1\ndouble**"  ];
+node_3 -> node_11 [ fontsize = 10 label = "sw:1\ndouble**"  ];
+node_13 -> node_12 [ fontsize = 10 label = "i32"  ];
+node_14 -> node_12 [ fontsize = 10 label = "sw: 0\ni32"  ];
+
+
+/* Additional source nodes */
+node_0 [ shape = "invhouse" rank = "source" style = "filled" bgcolor = "lightblue" ];
+}

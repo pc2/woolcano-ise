@@ -1,0 +1,13 @@
+digraph G {
+size = "8.3,11.7"; //a4 size
+label = "profile: [0.00%] main.bb4.i\n- cand_0.gv: 	   2 nodes 	 inputs:   1 	 sw:   1 	 hw:   5[comm:   4] 	 ratio: 0.20 	 not selected"
+node_0 [ label = "icmp" shape = "doublecircle" rank = "sink" style = "filled" color = "lightblue" ];
+node_1 [ label = "add" shape = "invhouse" rank = "source"];
+node_2 [ label = "constant" shape = "diamond" shape = "invhouse" rank = "source" style = "filled"                    bgcolor = "lightblue" ];
+node_1 -> node_0 [ fontsize = 10 label = "sw:1\ni32"  color = "gray" label = "" ];
+node_2 -> node_0 [ fontsize = 10 label = "sw: 0\ni32"  color = "gray" label = "" ];
+
+
+/* Additional source nodes */
+node_1 [ shape = "invhouse" rank = "source" style = "filled" bgcolor = "lightblue" ];
+}

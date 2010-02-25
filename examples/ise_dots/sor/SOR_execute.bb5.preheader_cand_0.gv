@@ -1,0 +1,13 @@
+digraph G {
+size = "8.3,11.7"; //a4 size
+label = "profile: [0.00%] SOR_execute.bb5.preheader\n- cand_0.gv: 	   3 nodes 	 inputs:   1 	 sw:   1 	 hw:   5[comm:   4] 	 ratio: 0.20 	 not selected"
+node_0 [ label = "phi" shape = "invhouse" rank = "source"];
+node_1 [ label = "add" shape = "doublecircle" rank = "sink" style = "filled" color = "lightblue" ];
+node_2 [ label = "M" shape = "invhouse" rank = "source" style = "filled" color = "lightblue" ];
+node_3 [ label = "constant" shape = "diamond" shape = "invhouse" rank = "source" style = "filled"                    bgcolor = "lightblue" ];
+node_2 -> node_1 [ fontsize = 10 label = "i32"  fontcolor = "blue" color = "lightblue"  ];
+node_3 -> node_1 [ fontsize = 10 label = "sw: 0\ni32"  color = "gray" label = "" ];
+
+
+/* Additional source nodes */
+}

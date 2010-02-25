@@ -29,49 +29,90 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		- select best candidates, exclude overlapping ones
 		- exclude candidates with speedup below predefined threshold
 */
+
+#include <iostream>
+#include <iomanip>
 #include "SelectionMethod1.h"
 #include "DataFlowGraph.h"
 #include "RuntimeEstimation.h"
+#include "llvm/BasicBlock.h"
+#include "llvm/Function.h"
+#include "Util.h"
+
 
 const float SelectionMethod1::threshold = 1.0f;
+const unsigned int LABEL_SIZE = 100;
 
-void SelectionMethod1::run(const ProfileList &profInfo, const ResultMap &candidates,
-						   const DfgMap &dfgs, const Architecture &arch, ResultMap &selection)
+void SelectionMethod1::run(
+      const ProfileList &profInfo, const ResultMap &candidates,
+      const DfgMap &dfgs, const Architecture &arch, ResultMap &selection,
+      bool DisableComm, bool DisableMaxCI, bool DisableMaxInput, int MaxCI, 
+      int MaxInput) 
 {
 	// construct DFGs for all candidates and estimate their 'value'
 	CandidateList candidateList;
+  std::ostringstream dot_label;
 	for (ProfileList::const_iterator it = profInfo.begin(); it != profInfo.end(); ++it)
 	{
 		ResultMap::const_iterator cand_it = candidates.find(it->first);
-		if (cand_it == candidates.end()) continue;
+		if (cand_it == candidates.end())  {
+      std::cout << "\n# no candidates found for: " << it->first->getName() << "\n" ;
+      continue;
+    }
 		const DataFlowGraph &parentDfg = dfgs.find(it->first)->second;
-		for (ResultVector::const_iterator bv_it = cand_it->second.begin();
-			bv_it != cand_it->second.end(); ++bv_it)
+
+    const llvm::BasicBlock *BB = it->first;
+    const llvm::Function   *FF = BB->getParent();
+    const ProfileInfo info = it->second;
+
+    char prof_info[LABEL_SIZE];
+    snprintf(prof_info, LABEL_SIZE, "profile: [%.2f%%] %s.%s", info.prob*100 , FF->getName().c_str(), BB->getName().c_str());
+    std::cout << "\n" << prof_info << "\n";
+
+    // iterate over list of candidates for given BB
+    int i = 0;
+		for (ResultVector::const_iterator bv_it = cand_it->second.begin(); bv_it != cand_it->second.end(); ++bv_it, i++)
 		{
+      // build dfg representing candidate
 			DataFlowGraph dfg(parentDfg, *bv_it);
+
 			// filter templates with too many inputs (MAXMISO algo)
-			if (dfg.num_inputs() > arch.getMaxInputs()) continue;
+      if (!DisableMaxInput)
+        if (dfg.num_inputs() > arch.getMaxInputs()) continue;
+
 			unsigned int sw = RuntimeEstimation::estimateSwRuntime(dfg, arch);
 			if (sw == 0) continue;
-			unsigned int hw = arch.convertHwToSwTiming(RuntimeEstimation::estimateHwRuntime(dfg, arch))
-				+ arch.getExecutionOverhead(dfg.num_inputs(), dfg.num_outputs());
+
+      unsigned int hwcomm = arch.getExecutionOverhead(dfg.num_inputs(), dfg.num_outputs());
+      unsigned int hw = arch.convertHwToSwTiming( RuntimeEstimation::estimateHwRuntime(dfg, arch)) + hwcomm;
+
 			float ratio = static_cast<float>(sw) / static_cast<float>(hw);
-/*
-			if (bv_it->count())
-			{
-				//std::cout << "nodes: " << bv_it->count() << "\n";
-				//std::cout << "sw: " << sw << "\n";
-				//std::cout << "hw: " << hw << "\n";
-				std::cout << "nodes: " << bv_it->count() << "\tsw: " << sw << "\thw: " << hw << "\tratio: " << ratio << "\n";
-			}
-*/
+
+
+      std::string name = "cand_" + Util::stringify(i) + ".gv";
+      char cand_res[LABEL_SIZE];
+      snprintf(cand_res, LABEL_SIZE, "- %.35s: \t %3d nodes \t inputs: %3d \t sw: %3d \t hw: %3d[comm: %3d] \t ratio: %.2f \t ", 
+          name.c_str(), bv_it->count(), dfg.num_inputs(), sw, hw, hwcomm, ratio);
+      std::cout << cand_res;
+
 			// ignore candidates with speedup below predefined threshold
+      std::ostringstream dot_code;
+      dot_code << "label = \"" << prof_info << "\\n" << cand_res;
 			if (ratio > threshold)
 			{
 				// calculate 'value'
 				float value = (1.0f + it->second.prob) * ratio * (dfg.num_vertices() - dfg.num_inputs());
 				candidateList.push_back(CandidateInfo(value, it->first, *bv_it));
-			}
+        std::cout << "selected\n";
+        dot_code << "selected";
+			} else {
+        std::cout << "not selected\n";
+        dot_code << "not selected";
+      }
+      dot_code << "\"\n";
+
+      std::string graphName = FF->getName() + "." + BB->getName() + "_cand_" + Util::stringify(i) + ".gv";
+      Util::dumpToFile(graphName, parentDfg.writeGraphviz2(false,false, *bv_it, arch, dot_code.str()));
 		}
 	}
 	// select best candidates, exclude overlapping patterns

@@ -35,8 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace std;
 
-void SelectionRandom::run(const ProfileList &profInfo, const ResultMap &candidates,
-						  const DfgMap &dfgs, const Architecture &arch, ResultMap &selection)
+void SelectionRandom::run(
+      const ProfileList &profInfo, const ResultMap &candidates,
+      const DfgMap &dfgs, const Architecture &arch, ResultMap &selection,
+      bool DisableComm, bool DisableMaxCI, bool DisableMaxInput, int MaxCI, 
+      int MaxInput) 
 {
 	unsigned int maxInsts = arch.getMaxCustomInstructions(), selected = 0;
 	ProfileList::const_iterator prof_it = profInfo.begin();

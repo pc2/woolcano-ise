@@ -32,8 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class SelectionAlgorithm
 {
 public:
-	virtual void run(const ProfileList &profInfo, const ResultMap &candidates,
-		const DfgMap &dfgs, const Architecture &arch, ResultMap &selection) {}
+	virtual void run( const ProfileList &profInfo, const ResultMap &candidates,
+      const DfgMap &dfgs, const Architecture &arch, ResultMap &selection,
+      bool DisableComm, bool DisableMaxCI, bool DisableMaxInput, int MaxCI, 
+      int MaxInput) {}
 };
 
 #endif

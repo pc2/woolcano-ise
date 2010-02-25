@@ -45,6 +45,7 @@ class Util
 public:
 	static std::string stringify(unsigned int x);
 	static bool fileExists(const std::string &filename);
+	static void appendToFile(const std::string &filename, const std::string &contents);
 	static void dumpToFile(const std::string &filename, const std::string &contents);
 };
 

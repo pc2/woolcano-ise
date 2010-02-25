@@ -1,0 +1,35 @@
+digraph G {
+size = "8.3,11.7"; //a4 size
+label = "profile: [49.73%] main.bb1\n- cand_0.gv: 	   3 nodes 	 inputs:   1 	 sw: 103 	 hw:   6[comm:   4] 	 ratio: 17.17 	 selected"
+node_0 [ label = "phi" shape = "invhouse" rank = "source"];
+node_1 [ label = "load" shape = "circle"];
+node_2 [ label = "getelementptr" shape = "invhouse" rank = "source"];
+node_3 [ label = "getelementptr" shape = "circle"];
+node_4 [ label = "call" shape = "circle"];
+node_5 [ label = "constant" shape = "invhouse" rank = "source"];
+node_6 [ label = "sitofp" shape = "circle" style = "filled" color = "lightblue" ];
+node_7 [ label = "mul" shape = "circle" style = "filled" color = "lightblue" ];
+node_8 [ label = "constant" shape = "diamond" shape = "invhouse" rank = "source" style = "filled"                    bgcolor = "lightblue" ];
+node_9 [ label = "store" shape = "doublecircle" rank = "sink"];
+node_10 [ label = "add" shape = "doublecircle" rank = "sink"];
+node_11 [ label = "constant" shape = "diamond"];
+node_12 [ label = "icmp" shape = "doublecircle" rank = "sink"];
+node_13 [ label = "constant" shape = "diamond"];
+node_2 -> node_1 [ fontsize = 10 label = "sw:1\ndouble**"  ];
+node_1 -> node_3 [ fontsize = 10 label = "sw:2\ndouble*"  ];
+node_0 -> node_3 [ fontsize = 10 label = "sw:1\ni32"  ];
+node_5 -> node_4 [ fontsize = 10 label = "sw: 0\ni32 ()*"  ];
+node_4 -> node_6 [ fontsize = 10 label = "sw:1\ni32"  color = "gray" label = "" ];
+node_6 -> node_7 [ fontsize = 10 label = "sw:1\ndouble"  fontcolor = "blue" color = "lightblue"  ];
+node_8 -> node_7 [ fontsize = 10 label = "sw: 0\ndouble"  color = "gray" label = "" ];
+node_7 -> node_9 [ fontsize = 10 label = "sw:102\ndouble"  fontcolor = "blue" color = "lightblue"  ];
+node_3 -> node_9 [ fontsize = 10 label = "sw:1\ndouble*"  ];
+node_0 -> node_10 [ fontsize = 10 label = "sw:1\ni32"  ];
+node_11 -> node_10 [ fontsize = 10 label = "sw: 0\ni32"  ];
+node_10 -> node_12 [ fontsize = 10 label = "sw:1\ni32"  ];
+node_13 -> node_12 [ fontsize = 10 label = "sw: 0\ni32"  ];
+
+
+/* Additional source nodes */
+node_4 [ shape = "invhouse" rank = "source" style = "filled" bgcolor = "lightblue" ];
+}

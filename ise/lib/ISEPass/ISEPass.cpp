@@ -48,29 +48,57 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace llvm;
 using namespace std;
 
-static cl::opt<string> ISEProfInfoFilename("ise-profile-info-file", cl::init("llvmprof.out"),
-										   cl::value_desc("filename"),
-										   cl::desc("Profile file used by -ise"));
-static cl::opt<bool> ISEOutputGraphs("ise-output-graphs", cl::desc("output Graphviz files"));
-static cl::opt<bool> ISEOutputSelected("ise-output-selected", cl::desc("output Graphviz files for selected templates"));
+static cl::opt<string> ISEProfInfoFilename("ise-profile-info-file", 
+    cl::init("llvmprof.out"),
+    cl::value_desc("filename"),
+    cl::desc("Profile file used by -ise"));
+
+static cl::opt<bool> ISEOutputGraphs("ise-output-graphs", 
+    cl::desc("output Graphviz files"));
+static cl::opt<bool> ISEOutputSelected("ise-output-selected", 
+    cl::desc("output Graphviz files for selected templates"));
+
 static cl::opt<bool> ISEBenchmark("ise-benchmark");
 static cl::opt<bool> ISENoSplitConstants("ise-no-split-constants");
 static cl::opt<bool> ISERuntimeEstimation("ise-runtime-estimation");
-static cl::opt<unsigned int> ISEBenchmarkTicks("ise-benchmark-ticks", cl::init(2500));
+static cl::opt<unsigned int> ISEBenchmarkTicks("ise-benchmark-ticks", 
+    cl::init(2500));
 
-static cl::opt<string> ISEArchitecture("ise-architecture", cl::init("virtual"),
-									cl::value_desc("architecture"),
-									cl::desc("Select ISE target architecture: virtual (def.), virtex"));
+static cl::opt<string> ISEArchitecture("ise-architecture", cl::init("virtex"),
+    cl::value_desc("architecture"),
+    cl::desc("Select ISE target architecture: virtual (def.), virtex"));
+
+static cl::opt<bool> ISEArchDisableComm("ise-architecture-disable-comm", 
+    cl::init(false),
+    cl::desc("Disable communication overheads (def. off)"));
+
+static cl::opt<bool> ISEArchDisableMaxCI("ise-architecture-disable-max-ci", 
+    cl::init(false),
+    cl::desc("Disable max number of custom_instructions (def. off)"));
+
+static cl::opt<bool> ISEArchDisableMaxInput("ise-architecture-disable-max-input", 
+    cl::init(false),
+    cl::desc("Disable max number of inputs for custom_instruction (def. off)"));
+
+
+static cl::opt<int> ISEArchMaxCI("ise-archi-max-ci", 
+    cl::init(-1),
+    cl::desc("Overwrite max number of custom_instruction"));
+
+static cl::opt<int> ISEArchMaxInput("ise-archi-max-input", 
+    cl::init(-1),
+    cl::desc("Overwrite max number of inputs for custom_instruction"));
+
 
 /* Identification algorithm - extracts graphs from app */
 static cl::opt<string> ISEAlgorithm("ise-algorithm", cl::init("maxmiso"),
-									cl::value_desc("algorithm"),
-									cl::desc("Select ISE identification algorithm: maxmiso (def.), singlecut, multicut, union"));
+    cl::value_desc("algorithm"),
+    cl::desc("Select ISE identification algorithm: maxmiso (def.), singlecut, multicut, union"));
 
 /* Selection Algorithm - selects apropriate BB from identificated graphs */
 static cl::opt<string> ISESelAlgorithm("ise-sel-algorithm", cl::init("method1"),
-									cl::value_desc("algorithm"),
-									cl::desc("Select ISE selection algorithm: method1 (def.), random"));
+    cl::value_desc("algorithm"),
+    cl::desc("Select ISE selection algorithm: method1 (def.), random"));
 
 namespace {
 	class ISEPass : public ModulePass
@@ -141,12 +169,12 @@ void ISEPass::readProfilingInfo(Module &M)
 		ProfileInfoLoader PIL("ise", ISEProfInfoFilename, M);
 		if (PIL.hasAccurateBlockCounts())
 		{
-         /* the vector assosiates BB with the counter representing execution of BB */
+      /* the vector assosiates BB with the counter representing execution of BB */
 			typedef vector< pair<BasicBlock*, unsigned> > ProfileInfoVector;
 			ProfileInfoVector counts;
 			PIL.getBlockCounts(counts);
 
-         /* get total number of BB execution  */
+      /* get total number of BB execution  */
 			double totalExecutions = 0;
 			for (ProfileInfoVector::const_iterator it = counts.begin();
 				it != counts.end(); ++it)
@@ -154,7 +182,7 @@ void ISEPass::readProfilingInfo(Module &M)
 				totalExecutions += it->second;
 			}
 
-         /* Assosiate BB with ExNum, Freq and store it as an list and hash */
+      /* Assosiate BB with ExNum, Freq and store it as an list and hash */
 			for (ProfileInfoVector::const_iterator it = counts.begin();
 				it != counts.end(); ++it)
 			{
@@ -189,10 +217,11 @@ void ISEPass::readProfilingInfo(Module &M)
 
 Architecture* ISEPass::getArchitecture(void)
 {
-	string algorithm = ISEArchitecture;
-	if (algorithm.compare("virtex") == 0)
+	string architecture = ISEArchitecture;
+  llvm::cout << "\nSelected architecture: " << architecture << "\n";
+	if (architecture.compare("virtex") == 0)
 		return new ArchitectureVirtexFx();
-	else if (algorithm.compare("virtual") != 0)
+	else if (architecture.compare("virtual") != 0)
 		llvm::cerr << "WARNING: Invalid target architecture specified, reverting to virtual\n";
 	return new ArchitectureVirtual();
 }
@@ -200,6 +229,7 @@ Architecture* ISEPass::getArchitecture(void)
 SelectionAlgorithm* ISEPass::getSelectionAlgorithm(void)
 {
 	string algorithm = ISESelAlgorithm;
+  llvm::cout << "\nSelection algorithm: " << algorithm<< "\n";
 	if (algorithm.compare("random") == 0)
 		return new SelectionRandom();
 	else if (algorithm.compare("method1") != 0)
@@ -210,6 +240,7 @@ SelectionAlgorithm* ISEPass::getSelectionAlgorithm(void)
 IseAlgorithm* ISEPass::getIdentificationAlgorithm(void)
 {
 	string algorithm = ISEAlgorithm;
+  llvm::cout << "\nIdentification algorithm: " << algorithm<< "\n";
 	if (algorithm.compare("singlecut") == 0)
 		return new AlgoSingleCut();
 	else if (algorithm.compare("multicut") == 0)
@@ -237,14 +268,15 @@ bool ISEPass::runOnModule(Module &M)
    /* iterate over functions in module */
 	for (Module::const_iterator I = M.begin(), E = M.end(); I != E; ++I)
 	{
+    //TODO: make option out of it!
 		// ignore main function (mainly for our benchmarks)
-		if (I->getName().compare("main") == 0 && !ISEBenchmark) continue;
+		// if (I->getName().compare("main") == 0 && !ISEBenchmark) continue;
 		unsigned int nB = 0;
 
       /* iterate over BB in function */
 		for (Function::const_iterator BB = I->begin(), E = I->end(); BB != E; ++BB, ++nB)
 		{
-         string IdentName = I->getName() + ":" + BB->getName();
+         string IdentName = I->getName() + "-" + BB->getName();
 			// ignore basic blocks that have not been executed
 			if (profileMap.find(BB)->second.count == 0) continue;
 
@@ -252,7 +284,9 @@ bool ISEPass::runOnModule(Module &M)
 			DataFlowGraph dfg = dfgFromBasicBlock(BB);
 			if (dfg.num_vertices() == 0) continue;
 			dfgMap.insert(make_pair(BB, dfg));
-			llvm::cout << "Processing DFG(" << IdentName <<") with " << dfg.num_vertices() << " nodes.\t";
+      printf("- processing DFG of func: %-25s\t bb: %-25s \t with %d nodes. ",
+          I->getName().c_str(), BB->getName().c_str(), dfg.num_vertices());
+
 
          /* in order to find the condidates from given dfg run indefication algorithm 
           * candidates =  dfg suitable for selection algorithm */
@@ -288,28 +322,34 @@ bool ISEPass::runOnModule(Module &M)
 				llvm::cout << time << "\n";
 			}
 
-         /* if candidates are found then store them in a map */
-			if (candidateVector.size() > 0)
-         {
-            llvm::cout << "- (different) candidate(s) found: " << candidateVector.size() << "\n";
-				resultMap.insert(make_pair(BB, candidateVector));
-         } else {
-            llvm::cout << "\n";
-         }
+      llvm::cout << "Found " << candidateVector.size() << " candidates.\n";
 
-         /* store to GraphViz files */
+      /* if candidates are found then store them in a map */
+      if (candidateVector.size() > 0)
+     {
+//        std::cout << "# storing " << IdentName << " with candidateVector.size()\
+//         = " << candidateVector.size() << "\n";
+        resultMap.insert(make_pair(BB, candidateVector));
+      } 
+
+      /* store to GraphViz files */
 			if (ISEOutputGraphs)
 			{
-            /* store whole DFG */
-				string blockName = modName + "_" + IdentName + "_" + Util::stringify(nB);
-				Util::dumpToFile(blockName + ".gv", dfg.writeGraphviz(true, true));
+        /* store whole DFG */
+				// string blockName = modName + "_" + IdentName + "_" + Util::stringify(nB);
+				string blockName = IdentName + "_" + Util::stringify(nB);
+				Util::dumpToFile(blockName + ".gv", dfg.writeGraphviz(false,true));
 
-            /* store candidates under *_cand_* name */
+        /* store candidates under *_cand_* name */
 				for (unsigned i = 0; i < candidateVector.size(); ++i)
-				{
-					string graphName = blockName + "_cand_" + Util::stringify(i) + ".gv";
-					Util::dumpToFile(graphName, DataFlowGraph(dfgMap.find(BB)->second, 
-						candidateVector[i]).writeGraphviz(true));
+        {
+
+//          string graphName = blockName + "_cand_" + Util::stringify(i) + ".gv";
+//					Util::dumpToFile(graphName, dfg.writeGraphviz2(false,false,
+//                candidateVector[i], *arch));
+
+//          Util::appendToFile("_"+graphName, DataFlowGraph(dfgMap.find(BB)->second, 
+//						candidateVector[i]).writeGraphviz(true));
 				}
 			}
 		}
@@ -319,10 +359,22 @@ bool ISEPass::runOnModule(Module &M)
 		llvm::cout << "#EOF\n";
 	delete algo;
 
+#if 0
+/* iteratre over resultMap */
+  std::cout << "Size: " << resultMap.size() << "\n";
+  for (ResultMap::iterator it = resultMap.begin(); it != resultMap.end(); it ++) {
+    const llvm::BasicBlock *bb = it->first;
+    ResultVector &cand = it->second;
+    std::cout << "# " << bb->getName() << " " << cand.size() << "\n";
+  }
+#endif
+  
 	// custom instruction selection
 	SelectionAlgorithm* selectAlgo = getSelectionAlgorithm();
 	ResultMap selected;
-	selectAlgo->run(profileList, resultMap, dfgMap, *arch, selected);
+	selectAlgo->run(profileList, resultMap, dfgMap, *arch, selected, 
+      ISEArchDisableComm, ISEArchDisableMaxCI, ISEArchDisableMaxInput, 
+      ISEArchMaxCI, ISEArchMaxInput);
 	delete selectAlgo;
 
 	// replace selected DFGs
@@ -376,7 +428,8 @@ bool ISEPass::runOnModule(Module &M)
 					DataFlowGraph dfg(parentDfg, *ise_it);
 					long long swsg = RuntimeEstimation::estimateSwRuntime(dfg, *arch);
 					long long hwsg = arch->convertHwToSwTiming(RuntimeEstimation::estimateHwRuntime(dfg, *arch));
-					hw = hw - swsg + hwsg + arch->getExecutionOverhead(dfg.num_inputs(), dfg.num_outputs());
+          hw = hw - swsg + hwsg +  arch->getExecutionOverhead(
+              dfg.num_inputs(), dfg.num_outputs());
 				}
 				runtimeHw += hw * prof_it->second.count;
 			}
