@@ -22,7 +22,7 @@ set (src_file   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.bc)
 set (dst_file   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_ise.bc)
 set (opt_file   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_prof.out)
 set (WRK_DIR    "${PROJECT_NAME}_ise")
-set (OPT_PASS_ARGS "")
+set (OPT_PASS_ARGS "-ise-runtime-estimation")
 
 set (cmake_file ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}_ise.cmake)
 CONFIGURE_FILE( ${LEVEL}/cmake/create_ise_pass_test.cmake.in  ${cmake_file} @ONLY)

@@ -12,5 +12,7 @@ include (${LEVEL}/cmake/enable_llvm_toolflow.cmake)
 # ======================================================
 add_bc_library(${PROJECT_NAME} whetstone.c) 
 
+set(RUN_PROF_ARGS -c 10000)
+
 
 include (${LEVEL}/cmake/enable_ise_targets.cmake)

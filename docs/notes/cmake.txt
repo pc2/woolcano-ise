@@ -6,11 +6,11 @@ The CMake is a bit cumbersome when one needs to do something a bit more advance.
 While it is possible to do it often the solution is not elegant.
 This is especially true when enabling other tool flow such as LLVM.
 
-One has to remember that CMake uses the configuraton files to generate Makefiles.
+One has to remember that CMake uses the configuration files to generate Makefiles.
 However Makefiles itself are configuration files which allow to build programs
 and libraries in automated way.
 
-Therefor one has to keep in mind when writing CMakes what corresponds to the
+Therefor one has to keep in mind when writing CMake files what corresponds to the
 CMake domain and what to Makefile.
 
 Configuration file = scripting language code.
@@ -30,7 +30,7 @@ We can create targets with CMake with these commands:
 The most interesting command is the last one: add_custom_target()
 The command which will be executed for the target will be executed in bash
 shell (not CMake language). This means that one can not execute CMake
-statments with it.
+statements with it.
 
 To write target which will run the CMake code one has to place the code in
 external file and call it like this:
@@ -41,7 +41,7 @@ CMake in script mode  and will execute the CMake code located in
 external.cmake file.
 
 Often we need to place some variable values to external.cmake.
-We can do that with preprocesor by creating defines like this:
+We can do that with preprocessor by creating defines like this:
   add_custom_target( foo ${CMAKE_COMMAND} -DFOO=BAR -P external.cmake )
 or like this:
   configure_file(external.cmake.in external.cmake)
@@ -79,12 +79,13 @@ In such case the foo/CMakeLists.txt script will have access to the variables
 and targets from current scope.
 
 
-The variables do not propagate to the parents (I belive targets do).
+The variables do not propagate to the parents (I belive targets do) unless
+they are setup with the help of PARENT_SCOPE.
 This means that variable created in foo/CMakeLists.txt will be not seen in
 current scope. However the target will.
 
 We can create target dependencies where each subdirectory will be connected to
-top target. assuming that we have main/a main/b main/c directories we can
+top target. Assuming that we have main/a main/b main/c directories we can
 create target 'main_foo' for main and in each a, b, c subdirectories we can
 add dep to it. Like this:
   add_dependencies(main_foo a) for main/a dir
@@ -92,9 +93,9 @@ add dep to it. Like this:
   add_dependencies(main_foo c) ..
 
 Now whenever: 'make main_foo' command will be executed it will be descended
-This allows for descendends to link to main_foo. The main_foo target does not
+This allows for descendants to link to main_foo. The main_foo target does not
 have to know anything about subdirs - the programs & libraries located there
-can attach themselfs automatically to build process.
+can attach themselves automatically to build process.
 
 
 //===----------------------------------------------------------------------===//
@@ -103,8 +104,8 @@ can attach themselfs automatically to build process.
 
 Sometimes we would like to share some of the Cmake configuration with other external targets.
 This is true when we would enable some functionality for the target depending
-on the existance of external target. Of course we could use the find_file()
-commands to figure out the existance of the external target but such approach
+on the existence of external target. Of course we could use the find_file()
+commands to figure out the existence of the external target but such approach
 will not always work well.
 
 To generate such configuration we can use:
@@ -113,7 +114,7 @@ or
   file(WRITE external.cmake "set(foo bar)"
 
 In both cases during execution of CMake both statements will generate
-external.cmake file with the set(foo bar) statment. This file can be later
+external.cmake file with the set(foo bar) statement. This file can be later
 included by other targets.
 
 The execute_process() command executes only shell (sh) commands. It is not

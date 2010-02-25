@@ -1,5 +1,9 @@
-message(STATUS "Enable LLVM toolflow")
-message(STATUS "====================")
+# ======================================================
+# create verbose status message
+
+# message(STATUS "Enable LLVM toolflow")
+# message(STATUS "====================")
+
 
 set (compiler        "llvm-gcc")
 set (linker          "llvm-link")
@@ -7,46 +11,53 @@ set (dis             "llvm-dis")
 set (opt             "opt")
 set (profiler        "" )
 
-set (COMPILER_FLAGS              -O3)
 set (COMPILER_LINKER_BC_FLAGS    -c --emit-llvm)
-set (OPT_FLAGS                   -O3)
 set (PROFILER_FLAGS              -block)
+
+if (NOT DEFINED COMPILER_FLAGS)
+  set (COMPILER_FLAGS              "")
+endif (NOT DEFINED COMPILER_FLAGS)
+if (NOT DEFINED OPT_FLAGS)
+  set (OPT_FLAGS                   "")
+endif (NOT DEFINED OPT_FLAGS)
 
 set (LIB_PREFIX  "lib")
 set (BC_SUFFIX   "bc")
 set (LL_SUFFIX   "ll")
 set (PROF_SUFFIX "out")
 
+message("COMPILER_FLAGS = ${COMPILER_FLAGS}")
+message("OPT_FLAGS      = ${OPT_FLAGS}")
 
 # ======================================================
 # get full paths to the tools
 
 find_program(LLVM_GCC ${compiler})
 if (LLVM_GCC)
-   message(STATUS "Found compiler       under: ${LLVM_GCC}")
+#   message(STATUS "Found compiler       under: ${LLVM_GCC}")
 else(LLVM_GCC)
-   message(FATAL_ERROR "ERROR: Could not find ${compiler}")
+#   message(FATAL_ERROR "ERROR: Could not find ${compiler}")
 endif(LLVM_GCC)
 
 find_program(LLVM_LINKER ${linker})
 if (LLVM_LINKER) 
-   message(STATUS "Found linker         under: ${LLVM_LINKER}")
+#   message(STATUS "Found linker         under: ${LLVM_LINKER}")
 else(LLVM_LINKER)
-  message(FATAL_ERROR "ERROR: Could not find ${linker}")
+#  message(FATAL_ERROR "ERROR: Could not find ${linker}")
 endif(LLVM_LINKER)
 
 find_program(LLVM_DIS ${dis})
 if (LLVM_DIS) 
-   message(STATUS "Found dissasembler   under: ${LLVM_DIS}")
+#   message(STATUS "Found dissasembler   under: ${LLVM_DIS}")
 else(LLVM_DIS)
-  message(FATAL_ERROR "ERROR: Could not find ${dis}")
+#  message(FATAL_ERROR "ERROR: Could not find ${dis}")
 endif(LLVM_DIS)
 
 find_program(LLVM_OPT ${opt})
 if (LLVM_OPT) 
-   message(STATUS "Found opt            under: ${LLVM_OPT}")
+#   message(STATUS "Found opt            under: ${LLVM_OPT}")
 else(LLVM_OPT)
-  message(FATAL_ERROR "ERROR: Could not find ${opt}")
+#  message(FATAL_ERROR "ERROR: Could not find ${opt}")
 endif(LLVM_OPT)
 
 
@@ -62,16 +73,16 @@ execute_process(
 )
 # check if LLVM_SRC_DIR directory exist
 if (IS_DIRECTORY ${LLVM_SRC_DIR})
-    message(STATUS "Found LLVM SRC DIR   under: ${LLVM_SRC_DIR}")
+#    message(STATUS "Found LLVM SRC DIR   under: ${LLVM_SRC_DIR}")
 else()
-    message(FATAL_ERROR " .. Couldn't find llvm src dir: ${LLVM_SRC_DIR}")
+#    message(FATAL_ERROR " .. Couldn't find llvm src dir: ${LLVM_SRC_DIR}")
 endif()
 
 set(LLVM_PROFILER   ${LLVM_SRC_DIR}/utils/profile.pl)
 if(EXISTS ${LLVM_PROFILER})
-   message(STATUS "Found profiler       under: ${LLVM_PROFILER}")
+#   message(STATUS "Found profiler       under: ${LLVM_PROFILER}")
 else()
-  message(FATAL_ERROR "ERROR: Could not find profiler")
+#  message(FATAL_ERROR "ERROR: Could not find profiler")
 endif()
 
 message("\n")

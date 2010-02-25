@@ -5,9 +5,9 @@ set(WRK_DIR       "@WRK_DIR@")
 
 set(SRC_FILE      "@src_file@")
 set(PROF_FILE     "@opt_file@")
-set(DST_FILE        "@dst_file@")
+set(DST_FILE      "@dst_file@")
 
-set(OPT_PASS_ARGS      "@OPT_PASS_ARGS@")
+set(OPT_PASS_ARGS "@OPT_PASS_ARGS@")
 
 # =========================================================== #
 # 0. check if proper params are given
