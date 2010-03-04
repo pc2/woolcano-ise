@@ -212,7 +212,7 @@ bool ArchitectureVirtexFx::isValidInstruction(const llvm::Instruction *inst) con
 	if (isa<StoreInst>(inst) || isa<LoadInst>(inst) ||
 		isa<TerminatorInst>(inst) || 
 //    isa<AllocationInst>(inst) ||
-		isa<CallInst>(inst) ||
+		isa<CallInst>(inst) 
 //		isa<GetElementPtrInst>(inst) || isa<PHINode>(inst))
 		return false;
 	else
