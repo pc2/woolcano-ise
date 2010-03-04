@@ -391,7 +391,9 @@ string DataFlowGraph::writeGraphviz2(bool outputCode, bool outputTopo, const Bit
 		for (unsigned int i = 0; i < topo.size(); i++)
 			topoVector[topo[i]] = i;
 	}
-	string result = "digraph G {\nsize = \"8.3,11.7\"; //a4 size\n";
+	string result = "digraph G {\n";
+//	result += "size = \"8.3,11.7\"; //a4 size\n";
+
   if (! dot_code.empty()) 
     result += dot_code;
 
@@ -445,7 +447,7 @@ string DataFlowGraph::writeGraphviz2(bool outputCode, bool outputTopo, const Bit
       // when it is constant than mark is as template input
       if (isa<Constant>(value)) {
         result += " shape = \"invhouse\" rank = \"source\" style = \"filled\" \
-                   bgcolor = \"lightblue\" " ;
+                   bgcolor = \"black\" color = \"lightblue\" " ;
       } else {
         // mark nodes which belong to template
          result += " style = \"filled\" color = \"lightblue\" ";
@@ -496,7 +498,7 @@ string DataFlowGraph::writeGraphviz2(bool outputCode, bool outputTopo, const Bit
       // when source node is not in bv than mark is as input to the template
       if (! bv[idxS]) {
         mark_src_nodes << "node_" << idxS << " [ shape = \"invhouse\" rank = \"source\" style = \"filled\" bgcolor = \"lightblue\" ];\n";
-        result += " color = \"gray\" label = \"\"";
+        result += " penwidth=2 color = \"gray\" label = \"comm\"";
       } else {
         if (isa<Constant>(value)) {
           result += " color = \"gray\" label = \"\"";

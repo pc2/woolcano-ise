@@ -1,0 +1,11 @@
+# install webdot
+sudo port install webdot
+
+# allow http connection only from localhost
+sudo vim /private/etc/apache2/httpd.conf
+- change Listen :80 to Listen 127.0.0.1:80
+
+# run http server
+sudo /usr/sbin/apachectl restart
+
+# now it should be available in your browser under: http://127.0.0.1/
