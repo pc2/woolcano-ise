@@ -28,3 +28,22 @@ Doxygen documentation
     cd woolcano-ise
     doxygen doxygen.cfg
 -  this will generate the doxygen docs under the woolcano-ise/doxygen/ dir.
+
+
+LLVM Profiler
+=========================
+
+In default build process profiler is not compiled.
+This command builds profiler library necessary for the profile.pl script.
+
+make -C `llvm-config --obj-root`/runtime
+
+
+Upgrading to OSX 10.6
+=========================
+
+Cmake by default on 10.6 OSX will create 64bit executables (O-Mach 64).
+The pass for the 'opt' tool has to be in 32 bit format (O-Mach).
+To generate 32 bit executables One needs to setup environmental variables:
+ CXXFLAGS="-m32"
+ CFLAGS="-m32"

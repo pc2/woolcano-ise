@@ -210,9 +210,10 @@ unsigned int ArchitectureVirtexFx::getExecutionOverhead(unsigned int nInputs,
 bool ArchitectureVirtexFx::isValidInstruction(const llvm::Instruction *inst) const
 {
 	if (isa<StoreInst>(inst) || isa<LoadInst>(inst) ||
-		isa<TerminatorInst>(inst) || isa<AllocationInst>(inst) ||
+		isa<TerminatorInst>(inst) || 
+//    isa<AllocationInst>(inst) ||
 		isa<CallInst>(inst) ||
-		isa<GetElementPtrInst>(inst) || isa<PHINode>(inst))
+//		isa<GetElementPtrInst>(inst) || isa<PHINode>(inst))
 		return false;
 	else
 		return true;

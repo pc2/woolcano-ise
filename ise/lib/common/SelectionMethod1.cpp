@@ -111,7 +111,7 @@ void SelectionMethod1::run(
       }
       dot_code << "\"\n";
 
-      std::string graphName = FF->getName() + "." + BB->getName() + "_cand_" + Util::stringify(i) + ".gv";
+      std::string graphName = FF->getName() + "-" + BB->getName() + "_cand_" + Util::stringify(i) + ".gv";
       Util::dumpToFile(graphName, parentDfg.writeGraphviz2(false,false, *bv_it, arch, dot_code.str()));
 		}
 	}

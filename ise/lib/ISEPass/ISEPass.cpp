@@ -340,10 +340,11 @@ bool ISEPass::runOnModule(Module &M)
 				string blockName = IdentName + "_" + Util::stringify(nB);
 				Util::dumpToFile(blockName + ".gv", dfg.writeGraphviz(false,true));
 
+
+#if 0
         /* store candidates under *_cand_* name */
 				for (unsigned i = 0; i < candidateVector.size(); ++i)
         {
-
 //          string graphName = blockName + "_cand_" + Util::stringify(i) + ".gv";
 //					Util::dumpToFile(graphName, dfg.writeGraphviz2(false,false,
 //                candidateVector[i], *arch));
@@ -351,6 +352,7 @@ bool ISEPass::runOnModule(Module &M)
 //          Util::appendToFile("_"+graphName, DataFlowGraph(dfgMap.find(BB)->second, 
 //						candidateVector[i]).writeGraphviz(true));
 				}
+#endif
 			}
 		}
 	}
