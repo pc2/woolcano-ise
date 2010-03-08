@@ -27,29 +27,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _ARCHITECTUREVIRTEXFPGA_H_
 
 #include "Architecture.h"
+#include <typeinfo>
+
 
 class ArchitectureVirtexFx: public Architecture
 {
-private:
-	static const unsigned int clockRate = 100 * 1000000;	// PPC running at 100 MHz
 public:
+
+    ArchitectureVirtexFx(
+                         bool CommDisableOverhead = true, 
+                         unsigned int CommClkPerInput = 2,
+                         float CommInputBusWidth = 2.0,
+                         unsigned int CommClkPerOutput = 2,
+                         float CommOutputBusWidth = 1.0,
+                         unsigned int MaxUDI  = 7,
+                         unsigned int MaxInput = 6, 
+                         unsigned int MaxOutput = 1);
+
+    
 	// returns expected execution time of instruction in implementation-specific units
 	virtual unsigned int getSwInstructionTiming(const llvm::Instruction* inst) const;
 	virtual unsigned int getHwInstructionTiming(const llvm::Instruction* inst) const;
 
-	// converts SW units to HW units
-	virtual unsigned int convertHwToSwTiming(unsigned int hwTiming) const;
-
-	// returns expected overhead for one execution in SW units
-	virtual unsigned int getExecutionOverhead(unsigned int nInputs, 
-		unsigned int nOutput) const;
-
 	// returns true if instruction is supported on hardware
 	virtual bool isValidInstruction(const llvm::Instruction* inst) const;
-
-	virtual unsigned int getMaxOutputs() const;
-	virtual unsigned int getMaxInputs() const;
-	virtual unsigned int getMaxCustomInstructions() const;
 };
 
 #endif

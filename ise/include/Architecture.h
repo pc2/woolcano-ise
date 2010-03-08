@@ -27,27 +27,65 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _ARCHITECTURE_H_
 
 #include "llvm/Instructions.h"
+#include <iostream>
+
 
 class Architecture
 {
+protected:
+    static const unsigned int clockRate = 100 * 1000000;	// PPC running at 100 MHz
+    bool CommDisableOverhead_;
+    unsigned int CommClkPerInput_;
+    float CommInputBusWidth_;   // unit = Input
+    unsigned int CommClkPerOutput_;          // 
+    float CommOutputBusWidth_;
+    unsigned int MaxUDI_;
+    unsigned int MaxInput_;   // per UDI
+    unsigned int MaxOutput_;  // per UDI    
 public:
+    
+    void setCommDisableOverhead(bool a) { CommDisableOverhead_ = a ; }
+    
 	// returns expected execution time of instruction in implementation-specific units
 	virtual unsigned int getSwInstructionTiming(const llvm::Instruction* inst) const = 0;
 	virtual unsigned int getHwInstructionTiming(const llvm::Instruction* inst) const = 0;
 
 	// converts HW units to SW units
-	virtual unsigned int convertHwToSwTiming(unsigned int hwTiming) const = 0;
+	virtual unsigned int convertHwToSwTiming(unsigned int hwTiming) const {
+        return ceil((static_cast<double>(hwTiming) * 0.0000000001) / (1.0 / static_cast<double>(clockRate)));
+    }
 
 	// returns expected overhead for one execution in SW units
 	virtual unsigned int getExecutionOverhead(unsigned int nInputs, 
-		unsigned int nOutput) const = 0;
+                                      unsigned int nOutputs)  const {
+        
+        if (CommDisableOverhead_) 
+            return 0;
+        
+        return ceil(nInputs / CommInputBusWidth_) * CommClkPerInput_ + 
+        ceil(nOutputs / CommOutputBusWidth_) * CommClkPerOutput_;
+    } 
 
 	// returns true if instruction is supported on hardware
 	virtual bool isValidInstruction(const llvm::Instruction* inst) const = 0;
 
-	virtual unsigned int getMaxOutputs() const = 0;
-	virtual unsigned int getMaxInputs() const = 0;
-	virtual unsigned int getMaxCustomInstructions() const = 0;
+
+    virtual unsigned int getMaxInputs() const
+    {
+        return MaxInput_;
+    }
+    
+    virtual unsigned int getMaxOutputs() const
+    {
+        return MaxOutput_;
+    }
+    
+    virtual unsigned int getMaxCustomInstructions() const
+    {
+        return MaxUDI_;
+    }
+
+    
 };
 
 #endif

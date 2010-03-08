@@ -303,7 +303,7 @@ string DataFlowGraph::writeGraphviz(bool outputCode, bool outputTopo) const
 		}
 		else if (isa<Constant>(value))
 		{
-			const Constant* c = cast<Constant>(value);
+//			const Constant* c = cast<Constant>(value);
 			result += "constant";
 		}
 		else

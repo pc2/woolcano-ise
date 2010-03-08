@@ -43,6 +43,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 
 using namespace llvm;
+ArchitectureVirtexFx::ArchitectureVirtexFx(bool CommDisableOverhead,     
+                                           unsigned int CommClkPerInput,
+                                           float CommInputBusWidth,
+                                           unsigned int CommClkPerOutput,
+                                           float CommOutputBusWidth,
+                                           unsigned int MaxUDI,
+                                           unsigned int MaxInput, 
+                                           unsigned int MaxOutput)
+{
+    CommDisableOverhead_ = CommDisableOverhead;
+    CommClkPerInput_ = CommClkPerInput;
+    CommInputBusWidth_ = CommInputBusWidth;
+    CommClkPerOutput_ =  CommClkPerOutput;
+    CommOutputBusWidth_ = CommOutputBusWidth;
+    MaxUDI_ =  MaxUDI;
+    MaxInput_ =  MaxInput;
+    MaxOutput_ = MaxOutput;
+    
+    std::cout << "Selected architecture: " <<  typeid(this).name() << 
+    "\n * CommDisableOverhead: " << CommDisableOverhead_ << 
+    "\n * CommClkPerInput: " << CommClkPerInput_ << 
+    "\n * CommInputBusWidth: " << CommInputBusWidth_ << 
+    "\n * CommClkPerOutput: " << CommClkPerOutput_ <<
+    "\n * CommOutputBusWidth: " << CommOutputBusWidth_ <<
+    "\n * MaxUDI: " << MaxUDI_ <<
+    "\n * MaxInput: " << MaxInput_ <<
+    "\n * MaxOutput: " << MaxOutput_ << "\n";
+}
+
 
 /*
 	SW units: clock cycles
@@ -193,44 +222,16 @@ unsigned int ArchitectureVirtexFx::getHwInstructionTiming(const llvm::Instructio
 	return 10;
 }
 
-unsigned int ArchitectureVirtexFx::convertHwToSwTiming(unsigned int hwTiming) const
-{
-	return ceil((static_cast<double>(hwTiming) * 0.0000000001) / (1.0 / static_cast<double>(clockRate)));
-}
 
-/*
-	returns expected overhead for one execution in SW units
-*/
-unsigned int ArchitectureVirtexFx::getExecutionOverhead(unsigned int nInputs,
-													unsigned int nOutputs) const
-{
-	return ceil(nInputs / 2.0) * 2 + nOutputs * 2;	// TODO?
-}
 
 bool ArchitectureVirtexFx::isValidInstruction(const llvm::Instruction *inst) const
 {
+//    isa<AllocationInst>(inst) || isa<GetElementPtrInst>(inst) || isa<PHINode>(inst))
 	if (isa<StoreInst>(inst) || isa<LoadInst>(inst) ||
-		isa<TerminatorInst>(inst) || 
-//    isa<AllocationInst>(inst) ||
-		isa<CallInst>(inst) 
-//		isa<GetElementPtrInst>(inst) || isa<PHINode>(inst))
+		isa<TerminatorInst>(inst) || isa<CallInst>(inst))
 		return false;
 	else
 		return true;
 }
 
 
-unsigned int ArchitectureVirtexFx::getMaxInputs() const
-{
-	return 6;
-}
-
-unsigned int ArchitectureVirtexFx::getMaxOutputs() const
-{
-	return 1;
-}
-
-unsigned int ArchitectureVirtexFx::getMaxCustomInstructions() const
-{
-	return 7;
-}
