@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class Architecture
 {
 protected:
-    static const unsigned int clockRate = 100 * 1000000;	// PPC running at 100 MHz
+    unsigned int clockRate_;     // PPC running at 100 MHz
     bool CommDisableOverhead_;
     unsigned int CommClkPerInput_;
     float CommInputBusWidth_;   // unit = Input
@@ -44,47 +44,37 @@ protected:
     unsigned int MaxOutput_;  // per UDI    
 public:
     
-    void setCommDisableOverhead(bool a) { CommDisableOverhead_ = a ; }
+    Architecture(unsigned int ClockRate = 100 * 1000000);
+    virtual void setClockRate(unsigned int);
+    virtual void setCommDisableOverhead(bool);
+    virtual void setCommClkPerInput(unsigned int);
+    virtual void setCommInputBusWidth(float);  
+    virtual void setCommClkPerOutput(unsigned int);
+    virtual void setCommOutputBusWidth(float);
+    virtual void setMaxUDI(unsigned int);
+    virtual void setMaxInput(unsigned int);
+    virtual void setMaxOutput(unsigned int);
     
+
 	// returns expected execution time of instruction in implementation-specific units
 	virtual unsigned int getSwInstructionTiming(const llvm::Instruction* inst) const = 0;
 	virtual unsigned int getHwInstructionTiming(const llvm::Instruction* inst) const = 0;
 
 	// converts HW units to SW units
-	virtual unsigned int convertHwToSwTiming(unsigned int hwTiming) const {
-        return ceil((static_cast<double>(hwTiming) * 0.0000000001) / (1.0 / static_cast<double>(clockRate)));
-    }
-
+	virtual unsigned int convertHwToSwTiming(unsigned int hwTiming) const;
+    
 	// returns expected overhead for one execution in SW units
 	virtual unsigned int getExecutionOverhead(unsigned int nInputs, 
-                                      unsigned int nOutputs)  const {
-        
-        if (CommDisableOverhead_) 
-            return 0;
-        
-        return ceil(nInputs / CommInputBusWidth_) * CommClkPerInput_ + 
-        ceil(nOutputs / CommOutputBusWidth_) * CommClkPerOutput_;
-    } 
+                                              unsigned int nOutputs)  const;
 
 	// returns true if instruction is supported on hardware
 	virtual bool isValidInstruction(const llvm::Instruction* inst) const = 0;
 
 
-    virtual unsigned int getMaxInputs() const
-    {
-        return MaxInput_;
-    }
+    virtual unsigned int getMaxInputs() const;
+    virtual unsigned int getMaxOutputs() const;
+    virtual unsigned int getMaxCustomInstructions() const;
     
-    virtual unsigned int getMaxOutputs() const
-    {
-        return MaxOutput_;
-    }
-    
-    virtual unsigned int getMaxCustomInstructions() const
-    {
-        return MaxUDI_;
-    }
-
     
 };
 
