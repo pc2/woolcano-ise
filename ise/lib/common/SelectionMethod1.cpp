@@ -45,9 +45,7 @@ const unsigned int LABEL_SIZE = 100;
 
 void SelectionMethod1::run(
       const ProfileList &profInfo, const ResultMap &candidates,
-      const DfgMap &dfgs, const Architecture &arch, ResultMap &selection,
-      bool DisableComm, bool DisableMaxCI, bool DisableMaxInput, int MaxCI, 
-      int MaxInput) 
+      const DfgMap &dfgs, const Architecture &arch, ResultMap &selection) 
 {
 	// construct DFGs for all candidates and estimate their 'value'
 	CandidateList candidateList;
@@ -77,7 +75,7 @@ void SelectionMethod1::run(
 			DataFlowGraph dfg(parentDfg, *bv_it);
 
 			// filter templates with too many inputs (MAXMISO algo)
-      if (!DisableMaxInput)
+//      if (!DisableMaxInput)
         if (dfg.num_inputs() > arch.getMaxInputs()) continue;
 
 			unsigned int sw = RuntimeEstimation::estimateSwRuntime(dfg, arch);
@@ -92,7 +90,7 @@ void SelectionMethod1::run(
       std::string name = "cand_" + Util::stringify(i) + ".gv";
       char cand_res[LABEL_SIZE];
       snprintf(cand_res, LABEL_SIZE, "- %.35s: \t %3d nodes \t inputs: %3d \t sw: %3d \t hw: %3d[comm: %3d] \t ratio: %.2f \t ", 
-          name.c_str(), bv_it->count(), dfg.num_inputs(), sw, hw, hwcomm, ratio);
+          name.c_str(), (int)bv_it->count(), dfg.num_inputs(), sw, hw, hwcomm, ratio);
       std::cout << cand_res;
 
 			// ignore candidates with speedup below predefined threshold

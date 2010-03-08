@@ -72,14 +72,11 @@ static cl::opt<bool> ISEArchDisableComm("ise-architecture-disable-comm",
     cl::init(false),
     cl::desc("Disable communication overheads (def. off)"));
 
-static cl::opt<bool> ISEArchDisableMaxCI("ise-architecture-disable-max-ci", 
-    cl::init(false),
-    cl::desc("Disable max number of custom_instructions (def. off)"));
-
-static cl::opt<bool> ISEArchDisableMaxInput("ise-architecture-disable-max-input", 
-    cl::init(false),
-    cl::desc("Disable max number of inputs for custom_instruction (def. off)"));
-
+#if 0
+static cl::opt<unsigned int> ISEArchCommClkPerInput("ise-archi-comm-clk-per-input, 
+                                 cl::init(-1),
+                                 cl::desc("Overwrite max number of custom_instruction"));
+#endif
 
 static cl::opt<int> ISEArchMaxCI("ise-archi-max-ci", 
     cl::init(-1),
@@ -88,6 +85,10 @@ static cl::opt<int> ISEArchMaxCI("ise-archi-max-ci",
 static cl::opt<int> ISEArchMaxInput("ise-archi-max-input", 
     cl::init(-1),
     cl::desc("Overwrite max number of inputs for custom_instruction"));
+
+static cl::opt<int> ISEArchMaxOutput("ise-archi-max-output", 
+                                    cl::init(-1),
+                                    cl::desc("Overwrite max number of outputs for custom_instruction"));
 
 
 /* Identification algorithm - extracts graphs from app */
@@ -285,7 +286,7 @@ bool ISEPass::runOnModule(Module &M)
 			if (dfg.num_vertices() == 0) continue;
 			dfgMap.insert(make_pair(BB, dfg));
       printf("- processing DFG of func: %-25s\t bb: %-25s \t with %d nodes. ",
-          I->getName().c_str(), BB->getName().c_str(), dfg.num_vertices());
+          I->getName().c_str(), BB->getName().c_str(), (int)dfg.num_vertices());
 
 
          /* in order to find the condidates from given dfg run indefication algorithm 
@@ -298,9 +299,9 @@ bool ISEPass::runOnModule(Module &M)
 			else
 			{
 				if (dfg.num_vertices() == 0) continue;
-				bool finished = false;
+//				bool finished = false;
 				float time = 0.0f;
-				unsigned long benchCount = 1;
+//				unsigned long benchCount = 1;
 				llvm::cout << dfg.num_vertices() << "\t";
 				unsigned long ticks_start = Benchmark::getTicks();
 				unsigned long ticks = 0, iterations = 0;
@@ -327,8 +328,10 @@ bool ISEPass::runOnModule(Module &M)
       /* if candidates are found then store them in a map */
       if (candidateVector.size() > 0)
      {
-//        std::cout << "# storing " << IdentName << " with candidateVector.size()\
-//         = " << candidateVector.size() << "\n";
+#if 0
+        std::cout << "# storing " << IdentName << " with candidateVector.size()\
+         = " << candidateVector.size() << "\n";
+#endif
         resultMap.insert(make_pair(BB, candidateVector));
       } 
 
@@ -374,9 +377,7 @@ bool ISEPass::runOnModule(Module &M)
 	// custom instruction selection
 	SelectionAlgorithm* selectAlgo = getSelectionAlgorithm();
 	ResultMap selected;
-	selectAlgo->run(profileList, resultMap, dfgMap, *arch, selected, 
-      ISEArchDisableComm, ISEArchDisableMaxCI, ISEArchDisableMaxInput, 
-      ISEArchMaxCI, ISEArchMaxInput);
+	selectAlgo->run(profileList, resultMap, dfgMap, *arch, selected);
 	delete selectAlgo;
 
 	// replace selected DFGs

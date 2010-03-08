@@ -27,27 +27,55 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _ARCHITECTURE_H_
 
 #include "llvm/Instructions.h"
+#include <iostream>
+
 
 class Architecture
 {
+protected:
+    unsigned int clockRate_;     // PPC running at 100 MHz
+    bool CommDisableOverhead_;
+    unsigned int CommClkPerInput_;
+    float CommInputBusWidth_;   // unit = Input
+    unsigned int CommClkPerOutput_;          // 
+    float CommOutputBusWidth_;
+    unsigned int MaxUDI_;
+    unsigned int MaxInput_;   // per UDI
+    unsigned int MaxOutput_;  // per UDI    
 public:
+    
+    Architecture(unsigned int ClockRate = 100 * 1000000);
+    virtual void setClockRate(unsigned int);
+    virtual void setCommDisableOverhead(bool);
+    virtual void setCommClkPerInput(unsigned int);
+    virtual void setCommInputBusWidth(float);  
+    virtual void setCommClkPerOutput(unsigned int);
+    virtual void setCommOutputBusWidth(float);
+    virtual void setMaxUDI(unsigned int);
+    virtual void setMaxInput(unsigned int);
+    virtual void setMaxOutput(unsigned int);
+    
+
 	// returns expected execution time of instruction in implementation-specific units
 	virtual unsigned int getSwInstructionTiming(const llvm::Instruction* inst) const = 0;
 	virtual unsigned int getHwInstructionTiming(const llvm::Instruction* inst) const = 0;
 
 	// converts HW units to SW units
-	virtual unsigned int convertHwToSwTiming(unsigned int hwTiming) const = 0;
-
+	virtual unsigned int convertHwToSwTiming(unsigned int hwTiming) const;
+    
 	// returns expected overhead for one execution in SW units
 	virtual unsigned int getExecutionOverhead(unsigned int nInputs, 
-		unsigned int nOutput) const = 0;
+                                              unsigned int nOutputs)  const;
 
 	// returns true if instruction is supported on hardware
 	virtual bool isValidInstruction(const llvm::Instruction* inst) const = 0;
 
-	virtual unsigned int getMaxOutputs() const = 0;
-	virtual unsigned int getMaxInputs() const = 0;
-	virtual unsigned int getMaxCustomInstructions() const = 0;
+
+    virtual unsigned int getMaxInputs() const;
+    virtual unsigned int getMaxOutputs() const;
+    virtual unsigned int getMaxCustomInstructions() const;
+    
+    
 };
 
 #endif
