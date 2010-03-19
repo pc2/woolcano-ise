@@ -43,31 +43,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 
 using namespace llvm;
-ArchitectureVirtexFx::ArchitectureVirtexFx(bool CommDisableOverhead,     
-                                           unsigned int CommClkPerInput,
-                                           float CommInputBusWidth,
-                                           unsigned int CommClkPerOutput,
-                                           float CommOutputBusWidth,
-                                           unsigned int MaxUDI,
+ArchitectureVirtexFx::ArchitectureVirtexFx(  
+                                           unsigned int CommInBusCLK,
+                                           unsigned int CommOutBusCLK,
+                                           float CommInBusWidth,
+                                           float CommOutBusWidth,
+                                           unsigned int MaxCI,
                                            unsigned int MaxInput, 
                                            unsigned int MaxOutput)
 {
-    CommDisableOverhead_ = CommDisableOverhead;
-    CommClkPerInput_ = CommClkPerInput;
-    CommInputBusWidth_ = CommInputBusWidth;
-    CommClkPerOutput_ =  CommClkPerOutput;
-    CommOutputBusWidth_ = CommOutputBusWidth;
-    MaxUDI_ =  MaxUDI;
+    CommInBusCLK_ = CommInBusCLK;
+    CommOutBusCLK_ = CommOutBusCLK;
+    
+    CommInBusWidth_ = CommInBusWidth;
+    CommOutBusWidth_ = CommOutBusWidth;
+    MaxCI_ =  MaxCI;
     MaxInput_ =  MaxInput;
     MaxOutput_ = MaxOutput;
     
-    std::cout << "Selected architecture: " <<  typeid(this).name() << 
-    "\n * CommDisableOverhead: " << CommDisableOverhead_ << 
-    "\n * CommClkPerInput: " << CommClkPerInput_ << 
-    "\n * CommInputBusWidth: " << CommInputBusWidth_ << 
-    "\n * CommClkPerOutput: " << CommClkPerOutput_ <<
-    "\n * CommOutputBusWidth: " << CommOutputBusWidth_ <<
-    "\n * MaxUDI: " << MaxUDI_ <<
+  
+    std::cerr << "Selected architecture: " <<  typeid(this).name() << 
+    "\nDefault settings: " <<
+    "\n * CommInBusCLK: " << CommInBusCLK_ << 
+    "\n * CommOutBusCLK_: " << CommOutBusCLK_ << 
+    
+    "\n * CommInBusWidth_: " << CommInBusWidth_ <<
+    "\n * CommOutBusWidth_: " << CommOutBusWidth_ <<
+    
+    "\n * MaxCI: " << MaxCI_ <<
     "\n * MaxInput: " << MaxInput_ <<
     "\n * MaxOutput: " << MaxOutput_ << "\n";
 }

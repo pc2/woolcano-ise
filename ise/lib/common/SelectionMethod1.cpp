@@ -73,7 +73,6 @@ void SelectionMethod1::run(
 		{
       // build dfg representing candidate
 			DataFlowGraph dfg(parentDfg, *bv_it);
-
 			// filter templates with too many inputs (MAXMISO algo)
 //      if (!DisableMaxInput)
         if (dfg.num_inputs() > arch.getMaxInputs()) continue;

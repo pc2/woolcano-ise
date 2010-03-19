@@ -55,6 +55,7 @@ static cl::opt<string> ISEProfInfoFilename("ise-profile-info-file",
 
 static cl::opt<bool> ISEOutputGraphs("ise-output-graphs", 
     cl::desc("output Graphviz files"));
+
 static cl::opt<bool> ISEOutputSelected("ise-output-selected", 
     cl::desc("output Graphviz files for selected templates"));
 
@@ -64,31 +65,53 @@ static cl::opt<bool> ISERuntimeEstimation("ise-runtime-estimation");
 static cl::opt<unsigned int> ISEBenchmarkTicks("ise-benchmark-ticks", 
     cl::init(2500));
 
-static cl::opt<string> ISEArchitecture("ise-architecture", cl::init("virtex"),
+static cl::opt<string> ISEArchitecture("ise-architecture", 
+    cl::init("virtex"),
     cl::value_desc("architecture"),
     cl::desc("Select ISE target architecture: virtual (def.), virtex"));
 
-static cl::opt<bool> ISEArchDisableComm("ise-architecture-disable-comm", 
-    cl::init(false),
-    cl::desc("Disable communication overheads (def. off)"));
+/* Communication settings */
 
-#if 0
-static cl::opt<unsigned int> ISEArchCommClkPerInput("ise-archi-comm-clk-per-input, 
-                                 cl::init(-1),
-                                 cl::desc("Overwrite max number of custom_instruction"));
-#endif
+static cl::opt<unsigned int>ISEArchCommNoInOverhead("ise-archi-comm-no-in-overhead",
+                                         cl::init(0),
+                                           cl::desc("How many input transactions are for free (def. 0)"));
 
+static cl::opt<unsigned int>ISEArchCommNoOutOverhead("ise-archi-comm-no-out-overhead",
+                                           cl::init(0),
+                                           cl::desc("How many output transactions are for free (def. 0)"));
+
+static cl::opt<int>ISEArchCommInBusWidth("ise-archi-comm-in-bus",
+                                         cl::init(-1),
+                                         cl::desc("Width of CI input bus [operand_size]"));
+
+static cl::opt<int>ISEArchCommOutBusWidth("ise-archi-comm-out-bus",
+                                          cl::init(-1),
+                                          cl::desc("Width of CI output bus [operand_size]"));
+
+static cl::opt<int>ISEArchCommInBusCLK("ise-archi-comm-in-bus-clk",
+                                       cl::init(-1),
+                                       cl::desc("Speed of CI input bus for transfering ise-archi-comm-in-bus operands"));
+
+static cl::opt<int>ISEArchCommOutBusCLK("ise-archi-comm-out-bus-clk",
+                                        cl::init(-1),
+                                        cl::desc("Speed of CI output bus for transfering ise-archi-comm-out-bus operands"));
+
+static cl::opt<int> ISEArchCommClk("ise-arch-comm-clk",
+                                            cl::init(-1),
+                                            cl::desc("CI Clock frequency [MHz]"));
+
+/* Quantities of inputs & outputs */                                                   
 static cl::opt<int> ISEArchMaxCI("ise-archi-max-ci", 
     cl::init(-1),
     cl::desc("Overwrite max number of custom_instruction"));
-
+                                                   
 static cl::opt<int> ISEArchMaxInput("ise-archi-max-input", 
     cl::init(-1),
     cl::desc("Overwrite max number of inputs for custom_instruction"));
-
+                                                    
 static cl::opt<int> ISEArchMaxOutput("ise-archi-max-output", 
-                                    cl::init(-1),
-                                    cl::desc("Overwrite max number of outputs for custom_instruction"));
+    cl::init(-1),
+    cl::desc("Overwrite max number of outputs for custom_instruction"));
 
 
 /* Identification algorithm - extracts graphs from app */
@@ -218,8 +241,7 @@ void ISEPass::readProfilingInfo(Module &M)
 
 Architecture* ISEPass::getArchitecture(void)
 {
-	string architecture = ISEArchitecture;
-  llvm::cout << "\nSelected architecture: " << architecture << "\n";
+    string architecture = ISEArchitecture;
 	if (architecture.compare("virtex") == 0)
 		return new ArchitectureVirtexFx();
 	else if (architecture.compare("virtual") != 0)
@@ -260,6 +282,25 @@ bool ISEPass::runOnModule(Module &M)
 	// custom instruction identification
 	IseAlgorithm *algo = getIdentificationAlgorithm();
 	Architecture *arch = getArchitecture();
+    
+    if (ISEArchCommClk != -1)       arch->setClockRate(ISEArchCommClk);
+
+    if (ISEArchMaxCI != -1)         arch->setMaxCI(ISEArchMaxCI); 
+    if (ISEArchMaxInput != -1)      arch->setMaxInput(ISEArchMaxInput); 
+    if (ISEArchMaxOutput != -1)     arch->setMaxInput(ISEArchMaxOutput); 
+    
+    if (ISEArchCommNoInOverhead >0)     arch->setCommNoInOverhead(ISEArchCommNoInOverhead);
+    if (ISEArchCommNoOutOverhead >0)    arch->setCommNoOutOverhead(ISEArchCommNoOutOverhead);
+    
+    if (ISEArchCommInBusWidth  != -1)   arch->setCommInBusWidth(ISEArchCommInBusWidth);
+    if (ISEArchCommOutBusWidth != -1)   arch->setCommOutBusWidth(ISEArchCommOutBusWidth); 
+    if (ISEArchCommInBusCLK != -1)      arch->setCommInBusCLK(ISEArchCommInBusCLK); 
+    if (ISEArchCommOutBusCLK != -1)     arch->setCommOutBusCLK(ISEArchCommOutBusCLK); 
+
+
+    
+    
+    
 	ResultMap resultMap;
 	DfgMap dfgMap;
 	string modName = M.getModuleIdentifier().substr(M.getModuleIdentifier().find_last_of("/\\") + 1);

@@ -35,11 +35,13 @@ class ArchitectureVirtexFx: public Architecture
 public:
 
     ArchitectureVirtexFx(
-                         bool CommDisableOverhead = true, 
-                         unsigned int CommClkPerInput = 2,
-                         float CommInputBusWidth = 2.0,
-                         unsigned int CommClkPerOutput = 2,
-                         float CommOutputBusWidth = 1.0,
+                         
+                         unsigned int CommInBusCLK = 2,
+                         unsigned int CommOutBusCLK = 2,
+
+                         float CommInBusWidth = 2.0,
+                         float CommOutBusWidth = 1.0,
+                         
                          unsigned int MaxUDI  = 7,
                          unsigned int MaxInput = 6, 
                          unsigned int MaxOutput = 1);

@@ -33,25 +33,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class Architecture
 {
 protected:
-    unsigned int clockRate_;     // PPC running at 100 MHz
-    bool CommDisableOverhead_;
-    unsigned int CommClkPerInput_;
-    float CommInputBusWidth_;   // unit = Input
-    unsigned int CommClkPerOutput_;          // 
-    float CommOutputBusWidth_;
-    unsigned int MaxUDI_;
-    unsigned int MaxInput_;   // per UDI
-    unsigned int MaxOutput_;  // per UDI    
+    unsigned int clockRate_;        // PPC - FCM speed
+
+    unsigned int CommNoInOverhead_;
+    unsigned int CommNoOutOverhead_;
+    
+    unsigned int CommInBusCLK_;     // unit size_of_operand (usually 32bit)
+    unsigned int CommOutBusCLK_;
+
+    float CommInBusWidth_;          // unit no_of_input_operand
+    float CommOutBusWidth_;
+    
+    unsigned int MaxCI_;
+    unsigned int MaxInput_;         // per UDI
+    unsigned int MaxOutput_;    
 public:
     
     Architecture(unsigned int ClockRate = 100 * 1000000);
     virtual void setClockRate(unsigned int);
-    virtual void setCommDisableOverhead(bool);
-    virtual void setCommClkPerInput(unsigned int);
-    virtual void setCommInputBusWidth(float);  
-    virtual void setCommClkPerOutput(unsigned int);
-    virtual void setCommOutputBusWidth(float);
-    virtual void setMaxUDI(unsigned int);
+    
+    virtual void setCommNoInOverhead(unsigned int);
+    virtual void setCommNoOutOverhead(unsigned int);
+    
+    virtual void setCommInBusWidth(float);  
+    virtual void setCommOutBusWidth(float);
+    
+    virtual void setCommInBusCLK(unsigned int);
+    virtual void setCommOutBusCLK(unsigned int);
+    
+    virtual void setMaxCI(unsigned int);
     virtual void setMaxInput(unsigned int);
     virtual void setMaxOutput(unsigned int);
     
