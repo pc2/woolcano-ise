@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <list>
 #include <llvm/BasicBlock.h>
 #include "SelectionAlgorithm.h"
+#include <sstream>
 
 class SelectionMethod1 : public SelectionAlgorithm
 {
