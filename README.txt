@@ -15,6 +15,18 @@ Use command: make test_ise_bench to benchmark ISE algos
 For more informations about running the code have a look at: 
 docs/notes/running.txt
 
+LLVM 
+=========================
+
+Use "ise_frozen" tag from llvm-mirror git repository.
+This corresponds to commit:
+$ git rev-parse ise_frozen
+0940bfd7b5f49436c17c5dc4a8534f90c5a9d02b
+
+This code is based on LLVM 2.5 and should be used with the LLVM-GCC 2.5
+front-end.
+
+
 Doxygen documentation
 =========================
 
