@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+
+use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
+use CGI ':standard';
+
+$current_time = localtime;
+
+print header,
+     start_html('A Virtual Clock'),
+     h1('A Virtual Clock'),
+     "The current time is $current_time.",
+     br,
+     $ENV{PATH_INFO},
+     br, hr;
+
+if ($ENV{PATH_INFO}) {
+  open (FILE, "$ENV{DOCUMENT_ROOT}$ENV{REQUEST_URI}");
+  while (<FILE>) {
+    print
+  }
+
+#  print "<a href=\"/cgi-bin/webdot$ENV{PATH_INFO}.dot.map\">";
+#  print "<img src=\"/cgi-bin/webdot$ENV{PATH_INFO}.dot.png\" ismap>";
+}
+
+print hr;
+
+foreach $var (sort(keys(%ENV))) {
+    $val = $ENV{$var};
+    $val =~ s|\n|\\n|g;
+    $val =~ s|"|\\"|g;
+    print "${var}=\"${val}\"<br>\n";
+}
+
+print
+     hr,
+     end_html;
+
+
+

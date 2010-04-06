@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+
+my $MAP_EXT=".dot.map";
+my $IMG_EXT=".dot.png";
+
+use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
+use CGI ':standard';
+
+$current_time = localtime;
+
+my $PRJ_DIR = "/Users/zuza/Work/src-repos/woolcano-ise/b_test/sor/dots";
+my $PRJ_DIR = "/Users/zuza/Work/src-repos/woolcano-ise/b_test/hce1/";
+$link_name = $PRJ_DIR;
+$link_name =~ s/\//_/g;
+
+symlink $PRJ_DIR, "../Documents/dots/$link_name";
+
+print header,
+     start_html('woolcano-ise visualizer'), "\n",
+     h1('woolcano-ise visualizer'), "\n",
+     "The current time is $current_time.", "\n",
+     br, "\n",
+     "PRJ_DIR = $PRJ_DIR" , "\n",
+     br, "\n",
+     hr, "\n";
+
+foreach $article ( `ls $PRJ_DIR`) {
+  chomp $article;
+  print a( {-href=>"/cgi-bin/visualize/dots/$link_name/$article"}, $article), br, "\n";
+}
+
+
+
+
+#    my $url="/cgi-bin/webdot$DOT_FILE$IMG_EXT";
+#    print "image: $url", "\n",
+#          br, "\n",
+#          a(  {-href=>"$url$MAP_EXT"}), "\n",
+#          img({-src=>"$url", alt=>'Graph'}), "\n" ;
+
+
+print
+     hr,
+     end_html;

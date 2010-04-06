@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+
+my $MAP_EXT=".dot.map";
+my $IMG_EXT=".dot.png";
+
+use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
+use CGI ':standard';
+
+$current_time = localtime;
+
+
+my $DOT_FILE = $ENV{PATH_INFO};
+my $DOT_FILE_FULL = "$ENV{DOCUMENT_ROOT}/$DOT_FILE";
+
+print header,
+     start_html('A Virtual Clock'), "\n",
+     h1('A Virtual Clock'), "\n",
+     "The current time is $current_time.", "\n",
+     br, "\n",
+     "DOT_FILE = $DOT_FILE" , "\n",
+     br, "\n";
+
+# webdot runs only with .dot files therefor for .gv files we are making link
+
+if ($DOT_FILE) {
+#  if ($DOT_FILE_FULL =~ s/^(.*)\.gv$/$1.dot/) {
+#    link $DOT_FILE_FULL, $1.dot;
+#    $DOT_FILE = "$1.dot";
+#  }
+    my $url="/cgi-bin/webdot$DOT_FILE$IMG_EXT";
+    print "image: $url", "\n",
+          br, "\n",
+#          a(  {-href=>"$url$MAP_EXT"}), "\n",
+          img({-src=>"$url", alt=>'Graph'}), "\n" ;
+
+}
+
+#  print "<a href=\"/cgi-bin/webdot$ENV{PATH_INFO}.dot.map\">";
+#  print "<img src=\"/cgi-bin/webdot$ENV{PATH_INFO}.dot.png\" ismap>";
+
+# print '<a href="/cgi-bin/webdot/ise_dots/sor/1.dot.dot.map">';
+# print '<img src="/cgi-bin/webdot/ise_dots/sor/1.dot.dot.png" ismap>';
+
+
+
+print
+     hr,
+     end_html;
