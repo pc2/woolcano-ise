@@ -1,32 +1,33 @@
 /*
-Copyright (c) 2009, Martin Tofall
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-    * The name of the author may not be used to endorse or promote products
-      derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY
-EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ Copyright (c) 2009, Martin Tofall
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in the
+ documentation and/or other materials provided with the distribution.
+ * The name of the author may not be used to endorse or promote products
+ derived from this software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY
+ EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+ DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 #include <llvm/Module.h>
 #include <llvm/Pass.h>
 #include <llvm/Support/CommandLine.h>
 #include <llvm/Analysis/ProfileInfoLoader.h>
+#include  <llvm/Support/Debug.h> 
 #include <vector>
 #include <map>
 #include "IseAlgorithm.h"
@@ -45,40 +46,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SelectionMethod1.h"
 #include "Types.h"
 
+
 using namespace llvm;
 using namespace std;
 
 static cl::opt<string> ISEProfInfoFilename("ise-profile-info-file", 
-    cl::init("llvmprof.out"),
-    cl::value_desc("filename"),
-    cl::desc("Profile file used by -ise"));
+                                           cl::init("llvmprof.out"),
+                                           cl::value_desc("filename"),
+                                           cl::desc("Profile file used by -ise"));
+static cl::opt<bool> ISEOutputBB("ise-output-bb", 
+                                 cl::desc("output Graphviz files for BB"));
+static cl::opt<bool> ISEOutputIdentCand("ise-output-ident-cand", 
+                                        cl::desc("output Graphviz files for identificated candidates"));
+static cl::opt<bool> ISEOutputSelCand("ise-output-sel-cand",
+                                      cl::init(false),
+                                      cl::desc("output Graphviz files for selected templates"));
+static cl::opt<bool> ISEOutputSelCI("ise-output-sel-ci", 
+                                    cl::desc("output Graphviz files for selected CI"));
 
-static cl::opt<bool> ISEOutputGraphs("ise-output-graphs", 
-    cl::desc("output Graphviz files"));
-
-static cl::opt<bool> ISEOutputSelected("ise-output-selected", 
-    cl::desc("output Graphviz files for selected templates"));
+static cl::opt<bool> ISEcreateCI("ise-create-ci", cl::init(false), cl::desc("create CI from selected templates"));
 
 static cl::opt<bool> ISEBenchmark("ise-benchmark");
 static cl::opt<bool> ISENoSplitConstants("ise-no-split-constants");
 static cl::opt<bool> ISERuntimeEstimation("ise-runtime-estimation");
 static cl::opt<unsigned int> ISEBenchmarkTicks("ise-benchmark-ticks", 
-    cl::init(2500));
+                                               cl::init(2500));
 
 static cl::opt<string> ISEArchitecture("ise-architecture", 
-    cl::init("virtex"),
-    cl::value_desc("architecture"),
-    cl::desc("Select ISE target architecture: virtual (def.), virtex"));
+                                       cl::init("virtex"),
+                                       cl::value_desc("architecture"),
+                                       cl::desc("Select ISE target architecture: virtual (def.), virtex"));
 
 /* Communication settings */
-
 static cl::opt<unsigned int>ISEArchCommNoInOverhead("ise-archi-comm-no-in-overhead",
-                                         cl::init(0),
-                                           cl::desc("How many input transactions are for free (def. 0)"));
+                                                    cl::init(0),
+                                                    cl::desc("How many input transactions are for free (def. 0)"));
 
 static cl::opt<unsigned int>ISEArchCommNoOutOverhead("ise-archi-comm-no-out-overhead",
-                                           cl::init(0),
-                                           cl::desc("How many output transactions are for free (def. 0)"));
+                                                     cl::init(0),
+                                                     cl::desc("How many output transactions are for free (def. 0)"));
 
 static cl::opt<int>ISEArchCommInBusWidth("ise-archi-comm-in-bus",
                                          cl::init(-1),
@@ -97,32 +103,36 @@ static cl::opt<int>ISEArchCommOutBusCLK("ise-archi-comm-out-bus-clk",
                                         cl::desc("Speed of CI output bus for transfering ise-archi-comm-out-bus operands"));
 
 static cl::opt<int> ISEArchCommClk("ise-arch-comm-clk",
-                                            cl::init(-1),
-                                            cl::desc("CI Clock frequency [MHz]"));
+                                   cl::init(-1),
+                                   cl::desc("CI Clock frequency [MHz]"));
 
 /* Quantities of inputs & outputs */                                                   
 static cl::opt<int> ISEArchMaxCI("ise-archi-max-ci", 
-    cl::init(-1),
-    cl::desc("Overwrite max number of custom_instruction"));
-                                                   
+                                 cl::init(-1),
+                                 cl::desc("Overwrite max number of custom_instruction"));
+
 static cl::opt<int> ISEArchMaxInput("ise-archi-max-input", 
-    cl::init(-1),
-    cl::desc("Overwrite max number of inputs for custom_instruction"));
-                                                    
+                                    cl::init(-1),
+                                    cl::desc("Overwrite max number of inputs for custom_instruction"));
+
 static cl::opt<int> ISEArchMaxOutput("ise-archi-max-output", 
-    cl::init(-1),
-    cl::desc("Overwrite max number of outputs for custom_instruction"));
+                                     cl::init(-1),
+                                     cl::desc("Overwrite max number of outputs for custom_instruction"));
 
 
 /* Identification algorithm - extracts graphs from app */
 static cl::opt<string> ISEAlgorithm("ise-algorithm", cl::init("maxmiso"),
-    cl::value_desc("algorithm"),
-    cl::desc("Select ISE identification algorithm: maxmiso (def.), singlecut, multicut, union"));
+                                    cl::value_desc("algorithm"),
+                                    cl::desc("Select ISE identification algorithm: maxmiso (def.), singlecut, multicut, union"));
+static cl::opt<bool> ISEAlgorithmStop("ise-algorithm-stop", 
+                                      cl::init(false),
+                                      cl::desc("Show only result of identification algorithm and then stop."));
+
 
 /* Selection Algorithm - selects apropriate BB from identificated graphs */
 static cl::opt<string> ISESelAlgorithm("ise-sel-algorithm", cl::init("method1"),
-    cl::value_desc("algorithm"),
-    cl::desc("Select ISE selection algorithm: method1 (def.), random"));
+                                       cl::value_desc("algorithm"),
+                                       cl::desc("Select ISE selection algorithm: method1 (def.), random"));
 
 namespace {
 	class ISEPass : public ModulePass
@@ -137,7 +147,7 @@ namespace {
 		static bool ProfileListSortPredicate(const ProfilePair& lhs, const ProfilePair& rhs);
 		typedef map<const Value*, const Value*> ValueMap;
 		void moveSubgraphToFunction(BasicBlock* bb, const DataFlowGraph &dfg,
-			const string &name, ValueMap &replaced);
+                                    const string &name, ValueMap &replaced);
 		DataFlowGraph dfgFromBasicBlock(const BasicBlock* bb);
 	public:
 		static char ID;
@@ -145,7 +155,7 @@ namespace {
 		virtual void getAnalysisUsage(AnalysisUsage &AU) const;
 		ISEPass() : ModulePass(&ID) {}
 	};
-
+    
 	class RuntimeEstimationPass : public ModulePass
 	{
 	public:
@@ -182,10 +192,10 @@ DataFlowGraph ISEPass::dfgFromBasicBlock(const BasicBlock* bb)
 }
 
 /*
-    reads profiling information and stores it in profileMap, profileList
-    each basic block is assigned a probability [0, 1]
-    warning: loading the wrong profiling information may cause the pass to crash
-*/
+ reads profiling information and stores it in profileMap, profileList
+ each basic block is assigned a probability [0, 1]
+ warning: loading the wrong profiling information may cause the pass to crash
+ */
 void ISEPass::readProfilingInfo(Module &M)
 {
 	if (Util::fileExists(ISEProfInfoFilename))
@@ -193,22 +203,22 @@ void ISEPass::readProfilingInfo(Module &M)
 		ProfileInfoLoader PIL("ise", ISEProfInfoFilename, M);
 		if (PIL.hasAccurateBlockCounts())
 		{
-      /* the vector assosiates BB with the counter representing execution of BB */
+            /* the vector assosiates BB with the counter representing execution of BB */
 			typedef vector< pair<BasicBlock*, unsigned> > ProfileInfoVector;
 			ProfileInfoVector counts;
 			PIL.getBlockCounts(counts);
-
-      /* get total number of BB execution  */
+            
+            /* get total number of BB execution  */
 			double totalExecutions = 0;
 			for (ProfileInfoVector::const_iterator it = counts.begin();
-				it != counts.end(); ++it)
+                 it != counts.end(); ++it)
 			{
 				totalExecutions += it->second;
 			}
-
-      /* Assosiate BB with ExNum, Freq and store it as an list and hash */
+            
+            /* Assosiate BB with ExNum, Freq and store it as an list and hash */
 			for (ProfileInfoVector::const_iterator it = counts.begin();
-				it != counts.end(); ++it)
+                 it != counts.end(); ++it)
 			{
 				ProfileInfo info(it->second, it->second / totalExecutions);
 				profileMap.insert(make_pair(it->first, info));
@@ -216,18 +226,18 @@ void ISEPass::readProfilingInfo(Module &M)
 			}
 		}
 	}
-
-   /* create artificial profiling stats */
+    
+    /* create artificial profiling stats */
 	if (profileList.size() == 0)
 	{
 		llvm::cerr << "WARNING: no profiling information found, assuming uniform distribution\n";
-
-      /* count the number of BB */
+        
+        /* count the number of BB */
 		double bbc = 0;
 		for (Module::const_iterator I = M.begin(), E = M.end(); I != E; ++I)
 			bbc += I->size();
-
-      /* assume that each bb was executed once */
+        
+        /* assume that each bb was executed once */
 		ProfileInfo info(1, 1.0f / bbc);
 		for (Module::const_iterator I = M.begin(), E = M.end(); I != E; ++I)
 			for (Function::const_iterator BB = I->begin(), E = I->end(); BB != E; ++BB)
@@ -252,7 +262,7 @@ Architecture* ISEPass::getArchitecture(void)
 SelectionAlgorithm* ISEPass::getSelectionAlgorithm(void)
 {
 	string algorithm = ISESelAlgorithm;
-  llvm::cout << "\nSelection algorithm: " << algorithm<< "\n";
+    llvm::cout << "\nSelection algorithm: " << algorithm<< "\n";
 	if (algorithm.compare("random") == 0)
 		return new SelectionRandom();
 	else if (algorithm.compare("method1") != 0)
@@ -263,7 +273,7 @@ SelectionAlgorithm* ISEPass::getSelectionAlgorithm(void)
 IseAlgorithm* ISEPass::getIdentificationAlgorithm(void)
 {
 	string algorithm = ISEAlgorithm;
-  llvm::cout << "\nIdentification algorithm: " << algorithm<< "\n";
+    llvm::cout << "\nIdentification algorithm: " << algorithm<< "\n";
 	if (algorithm.compare("singlecut") == 0)
 		return new AlgoSingleCut();
 	else if (algorithm.compare("multicut") == 0)
@@ -284,7 +294,7 @@ bool ISEPass::runOnModule(Module &M)
 	Architecture *arch = getArchitecture();
     
     if (ISEArchCommClk != -1)       arch->setClockRate(ISEArchCommClk);
-
+    
     if (ISEArchMaxCI != -1)         arch->setMaxCI(ISEArchMaxCI); 
     if (ISEArchMaxInput != -1)      arch->setMaxInput(ISEArchMaxInput); 
     if (ISEArchMaxOutput != -1)     arch->setMaxInput(ISEArchMaxOutput); 
@@ -296,163 +306,166 @@ bool ISEPass::runOnModule(Module &M)
     if (ISEArchCommOutBusWidth != -1)   arch->setCommOutBusWidth(ISEArchCommOutBusWidth); 
     if (ISEArchCommInBusCLK != -1)      arch->setCommInBusCLK(ISEArchCommInBusCLK); 
     if (ISEArchCommOutBusCLK != -1)     arch->setCommOutBusCLK(ISEArchCommOutBusCLK); 
-
-
     
     
+    if (ISEBenchmark) 
+        llvm::cout << "#Nodes\tmsecs\titerations\n";
+    
+    if (ISEAlgorithmStop)
+        DebugFlag = 1;
     
 	ResultMap resultMap;
 	DfgMap dfgMap;
 	string modName = M.getModuleIdentifier().substr(M.getModuleIdentifier().find_last_of("/\\") + 1);
-	if (ISEBenchmark)
-		llvm::cout << "#Nodes\tmsecs\n";
-
-   /* iterate over functions in module */
+    
+    /* iterate over functions in module */
 	for (Module::const_iterator I = M.begin(), E = M.end(); I != E; ++I)
 	{
-    //TODO: make option out of it!
+        //TODO: make option out of it!
 		// ignore main function (mainly for our benchmarks)
 		// if (I->getName().compare("main") == 0 && !ISEBenchmark) continue;
 		unsigned int nB = 0;
-
-      /* iterate over BB in function */
+        
+        /* iterate over BB in function */
 		for (Function::const_iterator BB = I->begin(), E = I->end(); BB != E; ++BB, ++nB)
 		{
-         string IdentName = I->getName() + "-" + BB->getName();
+            string IdentName = I->getName() + "-" + BB->getName();
 			// ignore basic blocks that have not been executed
 			if (profileMap.find(BB)->second.count == 0) continue;
-
-         /* Create DFG from BB  && associate both in a map*/
+            
+            /* Create DFG from BB  && associate both in a map*/
 			DataFlowGraph dfg = dfgFromBasicBlock(BB);
 			if (dfg.num_vertices() == 0) continue;
 			dfgMap.insert(make_pair(BB, dfg));
-      printf("- processing DFG of func: %-25s\t bb: %-25s \t with %d nodes. ",
-          I->getName().c_str(), BB->getName().c_str(), (int)dfg.num_vertices());
-
-
-         /* in order to find the condidates from given dfg run indefication algorithm 
-          * candidates =  dfg suitable for selection algorithm */
+            
+            
+            /* in order to find the condidates from given dfg run identification algorithm */
 			ResultVector candidateVector;
 			if (!ISEBenchmark)
 			{
+                printf("- processing DFG of func: %-25s\t bb: %-25s \t with %d nodes. ",
+                       I->getName().c_str(), BB->getName().c_str(), (int)dfg.num_vertices());
+                
 				algo->run(dfg, *arch, candidateVector);
-			}
-			else
+                llvm::cout << "Found " << candidateVector.size() << " candidates.\n";
+                
+                /* if candidates are found then store them in a map */
+                if (candidateVector.size() > 0)
+                {
+                    DEBUG(std::cout << "# storing " << IdentName << " with candidateVector.size()\
+                          = " << candidateVector.size() << "\n");
+                    
+                    resultMap.insert(make_pair(BB, candidateVector));
+                } 
+                
+                string blockName = IdentName + "_" + Util::stringify(nB);
+                /* store to GraphViz files */
+                if (ISEOutputBB)
+                {
+                    /* store whole DFG */
+                    // string blockName = modName + "_" + IdentName + "_" + Util::stringify(nB);
+                    Util::dumpToFile(blockName + ".gv", dfg.writeGraphviz(false,true));
+                }
+                if (ISEOutputIdentCand) {                    
+                    /* store ident. candidates under *_cand_* name */
+                    for (unsigned i = 0; i < candidateVector.size(); ++i)
+                    {
+                        string graphName = blockName + "_cand_" + Util::stringify(i) + ".gv";                    
+                        Util::dumpToFile("_"+graphName, DataFlowGraph(dfgMap.find(BB)->second, 
+                          candidateVector[i]).writeGraphviz(true));
+                    }
+                }
+			} 
+            else
 			{
+                // llvm::cout << "Benchmarking on\n";
 				if (dfg.num_vertices() == 0) continue;
-//				bool finished = false;
 				float time = 0.0f;
-//				unsigned long benchCount = 1;
 				llvm::cout << dfg.num_vertices() << "\t";
 				unsigned long ticks_start = Benchmark::getTicks();
 				unsigned long ticks = 0, iterations = 0;
+
 				do
 				{
 					algo->run(dfg, *arch, candidateVector, true);
+                    ticks = Benchmark::getTicks() - ticks_start;
 					candidateVector.clear();
 					++iterations;
-					ticks = Benchmark::getTicks() - ticks_start;
+
 				} while (ticks < ISEBenchmarkTicks);
 				if (iterations == 1 && ticks < 20000)
 				{
+                    candidateVector.clear();
 					unsigned long ticks_start2 = Benchmark::getTicks();
 					algo->run(dfg, *arch, candidateVector, true);
-					candidateVector.clear();
-					ticks = (ticks + (Benchmark::getTicks() - ticks_start2)) / 2;
+                    ticks = (ticks + (Benchmark::getTicks() - ticks_start2)) / 2;
 				}
 				time = static_cast<float>(ticks) / static_cast<float>(iterations);
-				llvm::cout << time << "\n";
+				llvm::cout << time << "\t" << iterations << "\n";
+                continue;  // jump to another block
 			}
-
-      llvm::cout << "Found " << candidateVector.size() << " candidates.\n";
-
-      /* if candidates are found then store them in a map */
-      if (candidateVector.size() > 0)
-     {
-#if 0
-        std::cout << "# storing " << IdentName << " with candidateVector.size()\
-         = " << candidateVector.size() << "\n";
-#endif
-        resultMap.insert(make_pair(BB, candidateVector));
-      } 
-
-      /* store to GraphViz files */
-			if (ISEOutputGraphs)
-			{
-        /* store whole DFG */
-				// string blockName = modName + "_" + IdentName + "_" + Util::stringify(nB);
-				string blockName = IdentName + "_" + Util::stringify(nB);
-				Util::dumpToFile(blockName + ".gv", dfg.writeGraphviz(false,true));
-
-
-#if 0
-        /* store candidates under *_cand_* name */
-				for (unsigned i = 0; i < candidateVector.size(); ++i)
-        {
-//          string graphName = blockName + "_cand_" + Util::stringify(i) + ".gv";
-//					Util::dumpToFile(graphName, dfg.writeGraphviz2(false,false,
-//                candidateVector[i], *arch));
-
-//          Util::appendToFile("_"+graphName, DataFlowGraph(dfgMap.find(BB)->second, 
-//						candidateVector[i]).writeGraphviz(true));
-				}
-#endif
-			}
-		}
+        }
 	}
-
-	if (ISEBenchmark)
-		llvm::cout << "#EOF\n";
+    
+	if (ISEBenchmark) {
+        llvm::cout << "#EOF\n";
+        return true; // exit from pass
+    }
+		
 	delete algo;
+    
+DEBUG(    
+    /* iteratre over resultMap */
+    std::cout << "Size: " << resultMap.size() << "\n";
+    for (ResultMap::iterator it = resultMap.begin(); it != resultMap.end(); it ++) {
+        const llvm::BasicBlock *bb = it->first;
+        ResultVector &cand = it->second;
+        std::cout << "# " << bb->getName() << " " << cand.size() << "\n";
+    });
+    
+    if (ISEAlgorithmStop) 
+        return true;
 
-#if 0
-/* iteratre over resultMap */
-  std::cout << "Size: " << resultMap.size() << "\n";
-  for (ResultMap::iterator it = resultMap.begin(); it != resultMap.end(); it ++) {
-    const llvm::BasicBlock *bb = it->first;
-    ResultVector &cand = it->second;
-    std::cout << "# " << bb->getName() << " " << cand.size() << "\n";
-  }
-#endif
-  
+
+    
 	// custom instruction selection
 	SelectionAlgorithm* selectAlgo = getSelectionAlgorithm();
 	ResultMap selected;
-	selectAlgo->run(profileList, resultMap, dfgMap, *arch, selected);
+	selectAlgo->run(profileList, resultMap, dfgMap, *arch, selected, ISEOutputSelCand);
 	delete selectAlgo;
-
+    
 	// replace selected DFGs
-	if (!ISEBenchmark)
+	if (ISEcreateCI)
 	{
 		unsigned int cur_udi = 0;
 		ValueMap replaced;
 		for (ResultMap::const_iterator it = selected.begin(); it != selected.end();
-			++it)
+             ++it)
 		{
 			for (ResultVector::const_iterator bv_it = it->second.begin();
-				bv_it != it->second.end(); ++bv_it)
+                 bv_it != it->second.end(); ++bv_it)
 			{
 				const DataFlowGraph& parentDfg = dfgMap.find(it->first)->second;
 				assert(parentDfg.num_vertices() == bv_it->size());
 				DataFlowGraph dfg(parentDfg, *bv_it);
-				if (ISEOutputSelected)
+				if (ISEOutputSelCI)
 				{
 					string graphName = modName + string("_udi") + Util::stringify(cur_udi) + ".gv";
 					Util::dumpToFile(graphName, dfg.writeGraphviz(true));
 				}
 				if (arch->getMaxOutputs() == 1)
     				moveSubgraphToFunction(const_cast<BasicBlock*>(it->first), dfg,
-					    string("udi") + Util::stringify(cur_udi++), replaced);
+                                           string("udi") + Util::stringify(cur_udi++), replaced);
 			}
 		}
 		llvm::cout << "Selected " << cur_udi << " templates\n";
 	}
-
-
+    
+    
 	/*
-		estimate runtime of whole program in pure software and with extended
-		instruction set
-	*/
+     estimate runtime of whole program in pure software and with extended
+     instruction set
+     */
 	if (ISERuntimeEstimation)
 	{
 		long long runtimeSw = 0, runtimeHw = 0;
@@ -467,13 +480,13 @@ bool ISEPass::runOnModule(Module &M)
 				long long hw = sw;
 				const DataFlowGraph &parentDfg = dfgMap.find(hw_it->first)->second;
 				for (ResultVector::const_iterator ise_it = hw_it->second.begin();
-					ise_it != hw_it->second.end(); ++ise_it)
+                     ise_it != hw_it->second.end(); ++ise_it)
 				{
 					DataFlowGraph dfg(parentDfg, *ise_it);
 					long long swsg = RuntimeEstimation::estimateSwRuntime(dfg, *arch);
 					long long hwsg = arch->convertHwToSwTiming(RuntimeEstimation::estimateHwRuntime(dfg, *arch));
-          hw = hw - swsg + hwsg +  arch->getExecutionOverhead(
-              dfg.num_inputs(), dfg.num_outputs());
+                    hw = hw - swsg + hwsg +  arch->getExecutionOverhead(
+                                                                        dfg.num_inputs(), dfg.num_outputs());
 				}
 				runtimeHw += hw * prof_it->second.count;
 			}
@@ -492,9 +505,9 @@ bool ISEPass::runOnModule(Module &M)
 }
 
 /*
-	moves all instructions in DFG to a new function
-	limited to a single output value
-*/
+ moves all instructions in DFG to a new function
+ limited to a single output value
+ */
 void ISEPass::moveSubgraphToFunction(BasicBlock* bb, const DataFlowGraph &dfg,
 									 const string &name, ValueMap &replaced)
 {
@@ -507,7 +520,7 @@ void ISEPass::moveSubgraphToFunction(BasicBlock* bb, const DataFlowGraph &dfg,
 	DataFlowGraph::VertexVector inputNodes;
 	DataFlowGraph::Vertex outputNode = dfg.null_vertex();
 	for (DataFlowGraph::VertexVector::const_iterator it = topo.begin();
-		it != topo.end(); ++it)
+         it != topo.end(); ++it)
 	{
 		DataFlowGraph::operator_t type = dfg.getType(*it);
 		if (type == DataFlowGraph::INPUT)
@@ -527,7 +540,7 @@ void ISEPass::moveSubgraphToFunction(BasicBlock* bb, const DataFlowGraph &dfg,
 	vector<const Type*> paramTypes;
 	vector<Value*> params;
 	for (DataFlowGraph::VertexVector::const_iterator it = inputNodes.begin();
-		it != inputNodes.end(); ++it)
+         it != inputNodes.end(); ++it)
 	{
 		const Value* value = dfg.getValue(*it);
 		ValueMap::const_iterator rep_it = replaced.find(value);
@@ -537,11 +550,11 @@ void ISEPass::moveSubgraphToFunction(BasicBlock* bb, const DataFlowGraph &dfg,
 		params.push_back(const_cast<Value*>(value));
 	}
 	Function* function = Function::Create(FunctionType::get(outputValue->getType(), paramTypes, false), 
-    GlobalValue::WeakAnyLinkage, name, bb->getParent()->getParent());
+                                          GlobalValue::WeakAnyLinkage, name, bb->getParent()->getParent());
 	BasicBlock* newBb = BasicBlock::Create(name + string("_entry"), function);
 	// insert function call
 	CallInst* call = CallInst::Create(function, params.begin(), params.end(), 
-		name + string("_call"), insertCallPos);
+                                      name + string("_call"), insertCallPos);
 	// keep track of replaced outputs
 	replaced.insert(make_pair(outputValue, call));
 	// replace references to output value
@@ -558,7 +571,7 @@ void ISEPass::moveSubgraphToFunction(BasicBlock* bb, const DataFlowGraph &dfg,
 	}
 	// insert instructions in topological order
 	ReturnInst* retInst = ReturnInst::Create(outputValue, newBb);
-
+    
 	DataFlowGraph::VertexVector::const_reverse_iterator it = topo.rbegin();
 	DataFlowGraph::VertexVector::const_reverse_iterator ite = topo.rend();
 	for (; it != ite; ++it )
@@ -573,7 +586,7 @@ void ISEPass::moveSubgraphToFunction(BasicBlock* bb, const DataFlowGraph &dfg,
 	// replace all references to inputs with references to function parameters
 	Function::arg_iterator arg_it = function->arg_begin();
 	for (vector<Value*>::const_iterator it = params.begin(); it != params.end();
-		++it)
+         ++it)
 	{
 		for (Value::use_iterator use_it = (*it)->use_begin(); use_it != (*it)->use_end();)
 		{
@@ -622,11 +635,11 @@ bool RuntimeEstimationPass::runOnModule(Module &M)
 			}
 			DataFlowGraph dfg(*BB);
 			unsigned int swsg = RuntimeEstimation::estimateSwRuntime(dfg, arch) +
-				arch.getSwInstructionTiming(BB->getTerminator());
+            arch.getSwInstructionTiming(BB->getTerminator());
 			unsigned int hwsg = arch.convertHwToSwTiming(RuntimeEstimation::estimateHwRuntime(dfg, arch))
-				+ arch.getExecutionOverhead(dfg.num_inputs(), dfg.num_outputs());
+            + arch.getExecutionOverhead(dfg.num_inputs(), dfg.num_outputs());
 			llvm::cout << I->getName() << "() - " << BB->getName() << "\tsw: " <<
-				swsg << "\thw: " << hwsg;
+            swsg << "\thw: " << hwsg;
 			if (prof_it != counts.end())
 			{
 				llvm::cout << "\tcount: " << prof_it->second;

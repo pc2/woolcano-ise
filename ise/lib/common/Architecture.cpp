@@ -83,7 +83,8 @@ void Architecture::setMaxOutput(unsigned int a) {
 
 // converts HW units to SW units
 unsigned int Architecture::convertHwToSwTiming(unsigned int hwTiming) const {
-    return   ceil((static_cast<double>(hwTiming) * 0.0000000001) / 
+    const float ns = 0.0000000001;
+    return   ceil((static_cast<double>(hwTiming) * ns) / 
              (1.0 / static_cast<double>(clockRate_)));
 }
 
@@ -91,12 +92,13 @@ unsigned int Architecture::convertHwToSwTiming(unsigned int hwTiming) const {
 unsigned int Architecture::getExecutionOverhead(unsigned int nInputs, 
                                                 unsigned int nOutputs)  const
 {   
+/*
     std::cerr << "getExecutionOverhead: in = " << nInputs << " out = " << nOutputs << "\n"
     << " input bus = " << CommInBusWidth_ << " operands"
     << " / speed = " << CommInBusCLK_ << " clks\n" 
     << " output bus = " << CommOutBusWidth_ << " operands"
     << " / speed = " << CommOutBusCLK_ << " clks\n"; 
-    
+*/    
     unsigned int clks = 0;
     
     // do not count first CommNoInOverhead transfers
@@ -104,8 +106,8 @@ unsigned int Architecture::getExecutionOverhead(unsigned int nInputs,
     //count rest 
     if (nInToCalc > 0) {
         clks = ceil(nInToCalc / CommInBusWidth_) * CommInBusCLK_;
-        std::cerr << "Free transfers = " << CommNoInOverhead_ << " ; left = " 
-            << nInToCalc << " operands to transfer -> " << clks << " clks\n"; 
+//        std::cerr << "Free transfers = " << CommNoInOverhead_ << " ; left = " 
+//            << nInToCalc << " operands to transfer -> " << clks << " clks\n"; 
     }
     
     // do not count first CommNoOutOverhead transfers
@@ -115,7 +117,7 @@ unsigned int Architecture::getExecutionOverhead(unsigned int nInputs,
     if (nOutToCalc > 0 ) {
         clks += ceil(nOutToCalc / CommOutBusWidth_) * CommOutBusCLK_;
     }
-    std::cerr << "getExecutionOverhead = " << clks << " clks\n\n";
+//    std::cerr << "getExecutionOverhead = " << clks << " clks\n\n";
     return clks;
 } 
 

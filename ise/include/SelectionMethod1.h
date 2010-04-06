@@ -34,7 +34,8 @@ class SelectionMethod1 : public SelectionAlgorithm
 {
 public:
 	virtual void run(const ProfileList &profInfo, const ResultMap &candidates,
-		const DfgMap &dfgs, const  Architecture &arch, ResultMap &selection) ;
+		const DfgMap &dfgs, const  Architecture &arch, ResultMap &selection, 
+        bool WriteGraphs) ;
 private:
 	static const float threshold;
 
