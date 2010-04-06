@@ -1,7 +1,10 @@
 set(target LLVMISEPass)
 add_llvm_library(${target} MODULE ISEPass.cpp)
 target_link_libraries(${target} LLVMISECommon)
-set(CMAKE_MODULE_LINKER_FLAGS "-undefined dynamic_lookup")
+
+if (APPLE)
+  set(CMAKE_MODULE_LINKER_FLAGS "-undefined dynamic_lookup")
+endif (APPLE)
 
 # During configuration process we are creating variable in the file which points out to the LLVM ISE pass
 # this is later picked up by other tools to obtain information if LLVM ISE is present and if yes then where

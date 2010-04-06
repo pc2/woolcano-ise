@@ -1,0 +1,12 @@
+We are building here static libraries which then are dynamically linked.
+In order to do that we need to create the "Position-independent code":
+
+export CFLAGS="$CFLAGS -fPIC"
+export CXXFLAGS="$CXXFLAGS -fPIC"
+
+
+We also have to disable the "-undefine dynamic_lookup" flag for linker.
+It can't be used on Linux systems - only on Darwin systems
+
+More details here:
+http://www.gentoo.org/proj/en/base/amd64/howtos/index.xml?part=1&chap=3#doc_chap7
