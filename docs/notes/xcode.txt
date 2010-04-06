@@ -1,0 +1,10 @@
+In order to work under XCode IDE issue the following command to create the
+XCode project:
+
+cd woolcano-ise && mkdir Xcode && cd Xcode
+cmake -G"Xcode" ..
+open woolcano-ise.xcodeproj
+
+Remember that whenver you will add new file (source or header) it will work
+under the Xcode but you have to manually change the CMakeFiles.txt to enable
+it during the build process outside the Xcode.
