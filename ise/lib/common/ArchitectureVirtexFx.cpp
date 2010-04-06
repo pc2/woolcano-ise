@@ -46,8 +46,8 @@ using namespace llvm;
 ArchitectureVirtexFx::ArchitectureVirtexFx(  
                                            unsigned int CommInBusCLK,
                                            unsigned int CommOutBusCLK,
-                                           float CommInBusWidth,
-                                           float CommOutBusWidth,
+                                           unsigned int CommInBusWidth,
+                                           unsigned int CommOutBusWidth,
                                            unsigned int MaxCI,
                                            unsigned int MaxInput, 
                                            unsigned int MaxOutput)

@@ -176,7 +176,7 @@ unsigned int ArchitectureVirtual::getHwInstructionTiming(const llvm::Instruction
 
 unsigned int ArchitectureVirtual::convertHwToSwTiming(unsigned int hwTiming) const
 {
-	return ceil(hwTiming / 10.0);
+	return static_cast<unsigned int>(ceil(hwTiming / 10.0));
 }
 
 /*
@@ -185,7 +185,7 @@ unsigned int ArchitectureVirtual::convertHwToSwTiming(unsigned int hwTiming) con
 unsigned int ArchitectureVirtual::getExecutionOverhead(unsigned int nInputs,
 													   unsigned int nOutputs) const
 {
-	return ceil(nInputs / 4.0) + ceil(nOutputs / 2.0);
+	return static_cast<unsigned int>(ceil(nInputs / 4.0) + ceil(nOutputs / 2.0));
 }
 
 bool ArchitectureVirtual::isValidInstruction(const llvm::Instruction *inst) const

@@ -3,6 +3,7 @@ add_llvm_library(LLVMISECommon
   AlgoMultipleCuts.cpp
   AlgoSingleCut.cpp
   AlgoUnion.cpp
+  Architecture.cpp
   ArchitectureVirtexFx.cpp
   ArchitectureVirtual.cpp
   Benchmark.cpp

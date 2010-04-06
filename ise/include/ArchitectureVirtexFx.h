@@ -39,8 +39,8 @@ public:
                          unsigned int CommInBusCLK = 2,
                          unsigned int CommOutBusCLK = 2,
 
-                         float CommInBusWidth = 2.0,
-                         float CommOutBusWidth = 1.0,
+                         unsigned int CommInBusWidth = 2.0,
+                         unsigned int CommOutBusWidth = 1.0,
                          
                          unsigned int MaxUDI  = 7,
                          unsigned int MaxInput = 6, 

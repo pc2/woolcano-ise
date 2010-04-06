@@ -41,8 +41,8 @@ protected:
     unsigned int CommInBusCLK_;     // unit size_of_operand (usually 32bit)
     unsigned int CommOutBusCLK_;
 
-    float CommInBusWidth_;          // unit no_of_input_operand
-    float CommOutBusWidth_;
+    unsigned int CommInBusWidth_;          // unit no_of_input_operand
+    unsigned int CommOutBusWidth_;
     
     unsigned int MaxCI_;
     unsigned int MaxInput_;         // per UDI
@@ -55,8 +55,8 @@ public:
     virtual void setCommNoInOverhead(unsigned int);
     virtual void setCommNoOutOverhead(unsigned int);
     
-    virtual void setCommInBusWidth(float);  
-    virtual void setCommOutBusWidth(float);
+    virtual void setCommInBusWidth(unsigned int);  
+    virtual void setCommOutBusWidth(unsigned int);
     
     virtual void setCommInBusCLK(unsigned int);
     virtual void setCommOutBusCLK(unsigned int);

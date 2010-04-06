@@ -251,7 +251,7 @@ void ISEPass::readProfilingInfo(Module &M)
 
 Architecture* ISEPass::getArchitecture(void)
 {
-    string architecture = ISEArchitecture;
+  string architecture = ISEArchitecture;
 	if (architecture.compare("virtex") == 0)
 		return new ArchitectureVirtexFx();
 	else if (architecture.compare("virtual") != 0)

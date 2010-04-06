@@ -33,13 +33,13 @@ void Architecture::setCommNoOutOverhead(unsigned int a) {
     CommNoOutOverhead_ = a;
 }
 
-void Architecture::setCommInBusWidth(float a) {
+void Architecture::setCommInBusWidth(unsigned int a) {
     if (a != CommInBusWidth_) {
         std::cerr << "- changing value of CommInBusWidth: " << a << "\n";
         CommInBusWidth_ = a;       
     }
 }  
-void Architecture::setCommOutBusWidth(float a) {
+void Architecture::setCommOutBusWidth(unsigned int a) {
     if (a != CommOutBusWidth_) {
         std::cerr << "- changing value of CommOutBusWidth: " << a << "\n";
         CommOutBusWidth_ = a;       
@@ -84,8 +84,9 @@ void Architecture::setMaxOutput(unsigned int a) {
 // converts HW units to SW units
 unsigned int Architecture::convertHwToSwTiming(unsigned int hwTiming) const {
     const float ns = 0.0000000001;
-    return   ceil((static_cast<double>(hwTiming) * ns) / 
+    double tmp = ceil((static_cast<double>(hwTiming) * ns) / 
              (1.0 / static_cast<double>(clockRate_)));
+    return static_cast<unsigned int>(tmp);
 }
 
 // returns expected overhead for one execution in SW units
@@ -105,7 +106,7 @@ unsigned int Architecture::getExecutionOverhead(unsigned int nInputs,
     int nInToCalc = nInputs - (CommInBusWidth_ * CommNoInOverhead_);
     //count rest 
     if (nInToCalc > 0) {
-        clks = ceil(nInToCalc / CommInBusWidth_) * CommInBusCLK_;
+        clks = static_cast<unsigned int>(ceil(nInToCalc / CommInBusWidth_) * CommInBusCLK_);
 //        std::cerr << "Free transfers = " << CommNoInOverhead_ << " ; left = " 
 //            << nInToCalc << " operands to transfer -> " << clks << " clks\n"; 
     }
@@ -115,7 +116,7 @@ unsigned int Architecture::getExecutionOverhead(unsigned int nInputs,
     
     // count rest
     if (nOutToCalc > 0 ) {
-        clks += ceil(nOutToCalc / CommOutBusWidth_) * CommOutBusCLK_;
+        clks += static_cast<unsigned int>(ceil(nOutToCalc / CommOutBusWidth_) * CommOutBusCLK_);
     }
 //    std::cerr << "getExecutionOverhead = " << clks << " clks\n\n";
     return clks;
