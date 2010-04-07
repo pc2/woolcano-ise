@@ -1,0 +1,9 @@
+[21:19:28][mgrad@pc-mgrad:~/Work/src-repos/woolcano-ise/b_test]$ ./histogram.sh 
+There are 14    candidates [    34 nodes ;    2 selected = 14.0% ]  which have the input size of 0   parameters.
+There are 453   candidates [  1266 nodes ;   55 selected = 12.0% ]  which have the input size of 1   parameters.
+There are 363   candidates [  1985 nodes ;  309 selected = 85.0% ]  which have the input size of 2   parameters.
+There are 14    candidates [    48 nodes ;   13 selected = 92.0% ]  which have the input size of 3   parameters.
+There are 19    candidates [   117 nodes ;   19 selected = 100.0% ]  which have the input size of 4   parameters.
+There are 109   candidates [  1036 nodes ;  109 selected = 100.0% ]  which have the input size of 5   parameters.
+There are 29    candidates [   253 nodes ;   29 selected = 100.0% ]  which have the input size of 6   parameters.
+There are 2     candidates [    17 nodes ;    2 selected = 100.0% ]  which have the input size of 7   parameters.
