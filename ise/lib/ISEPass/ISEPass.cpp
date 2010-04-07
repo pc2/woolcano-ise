@@ -297,7 +297,7 @@ bool ISEPass::runOnModule(Module &M)
     
     if (ISEArchMaxCI != -1)         arch->setMaxCI(ISEArchMaxCI); 
     if (ISEArchMaxInput != -1)      arch->setMaxInput(ISEArchMaxInput); 
-    if (ISEArchMaxOutput != -1)     arch->setMaxInput(ISEArchMaxOutput); 
+    if (ISEArchMaxOutput != -1)     arch->setMaxOutput(ISEArchMaxOutput); 
     
     if (ISEArchCommNoInOverhead >0)     arch->setCommNoInOverhead(ISEArchCommNoInOverhead);
     if (ISEArchCommNoOutOverhead >0)    arch->setCommNoOutOverhead(ISEArchCommNoOutOverhead);
