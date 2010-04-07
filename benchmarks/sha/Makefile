@@ -1,14 +1,14 @@
 include ../Makefile.common
 
-BITCODE = sha_test.bc sha.bc
+BITCODE = sha_test.bc _sha.bc
 #-DUNROLL_LOOPS 
 
-sha_test_.bc : $(BITCODE)
-	llvm-link $(BITCODE) -f -o sha_test_.bc
+sha.bc : $(BITCODE)
+	llvm-link $(BITCODE) -f -o sha.bc
 
 .C.BC:
 
-sha.bc: sha.c
+_sha.bc: sha.c
 	$(CC) $(CCOPTS) $< -c -o $@
 
 sha_test.bc: sha_test.c

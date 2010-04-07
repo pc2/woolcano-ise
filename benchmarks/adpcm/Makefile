@@ -1,17 +1,17 @@
 include ../Makefile.common
 
-BITCODE = adpcm.bc rawcaudio.bc rawdaudio.bc timing.bc
+BITCODE = _adpcm.bc rawcaudio.bc rawdaudio.bc timing.bc
 
-timing_.bc : $(BITCODE)
-	llvm-link adpcm.bc timing.bc -f -o timing_.bc
+adpcm.bc : $(BITCODE)
+	llvm-link _adpcm.bc timing.bc -f -o adpcm.bc
 rawcaudio_.bc : $(BITCODE)
-	llvm-link adpcm.bc rawcaudio.bc -f -o rawcaudio_.bc
+	llvm-link _adpcm.bc rawcaudio.bc -f -o rawcaudio_.bc
 rawdaudio_.bc : $(BITCODE)
-	llvm-link adpcm.bc rawdaudio.bc -f -o rawdaudio_.bc
+	llvm-link _adpcm.bc rawdaudio.bc -f -o rawdaudio_.bc
 
 .C.BC:
 
-adpcm.bc: adpcm.c
+_adpcm.bc: adpcm.c
 	$(CC) $(CCOPTS) $< -c -o $@
 timing.bc: timing.c
 	$(CC) $(CCOPTS) $< -c -o $@

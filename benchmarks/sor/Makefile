@@ -1,17 +1,15 @@
 include ../Makefile.common
 
-BITCODE = sor.bc main.bc
+BITCODE = _sor.bc main.bc
 
-sor_test.bc : $(BITCODE)
-	llvm-link $(BITCODE) -f -o sor_test.bc
+sor.bc : $(BITCODE)
+	llvm-link $(BITCODE) -f -o sor.bc
 
-.C.BC:
-
-sor.bc: sor.c
+_sor.bc: sor.c
 	$(CC) $(CCOPTS) $< -c -o $@
 
 main.bc: main.c
 	$(CC) $(CCOPTS) $< -c -o $@
 
 clean:
-	rm -f $(BITCODE) sor_test.bc
+	rm -rf sor.bc $(BITCODE) sor_test.bc tmp* *_txt *prof *ll *bc *log dots

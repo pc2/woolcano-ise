@@ -1,13 +1,13 @@
 include ../Makefile.common
 
-BITCODE = fft.bc main.bc
+BITCODE = _fft.bc main.bc
 
-fft_test.bc : $(BITCODE)
-	llvm-link $(BITCODE) -f -o fft_test.bc
+fft.bc : $(BITCODE)
+	llvm-link $(BITCODE) -f -o fft.bc
 
 .C.BC:
 
-fft.bc: fft.c
+_fft.bc: fft.c
 	$(CC) $(CCOPTS) $< -c -o $@
 
 main.bc: main.c
