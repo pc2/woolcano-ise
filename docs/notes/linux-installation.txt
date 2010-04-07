@@ -1,3 +1,4 @@
+# ---------------------------------------- #
 We are building here static libraries which then are dynamically linked.
 In order to do that we need to create the "Position-independent code":
 
@@ -10,3 +11,22 @@ It can't be used on Linux systems - only on Darwin systems
 
 More details here:
 http://www.gentoo.org/proj/en/base/amd64/howtos/index.xml?part=1&chap=3#doc_chap7
+
+# ---------------------------------------- #
+The ISE methods are working in 32 bit mode.
+This is because ISE methods were compiled with ise_frozen branch (27 may 2009)
+of llvm, which is still release 2.5.
+In order to get it working one needs 2.5 llvm-gcc front-end release which is
+available in binaries only in 32 bit mode. I couldn't compile the front end
+sucsesfully on clovertown (centos) machine without root access (there is a
+need for many libraries). It always ended up with different errors. Therefor
+the only way was to use the 32 bit mode.
+
+The 2.6 front-end (which comes in 32 and 64bit mode) from binaries is not compatible with the ISE pass. 
+
+In order to make the pass running one needs to:
+export CFLAGS="$CFLAGS -m32"
+export CXXFLAGS="$CXXFLAGS -m32"
+- install llvm-gcc front end binaries for the 2.5 release
+- compile llvm ise_frozen branch in 32 bit mode
+- compile ISE pass 
