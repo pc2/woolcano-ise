@@ -1,0 +1,7 @@
+
+
+app  = aes
+algo = multicut
+arch = virtex
+gcc =   -emit-llvm
+opt =  

@@ -1,0 +1,19 @@
+
+
+app  = md5
+algo = multicut
+arch = virtex
+gcc =   -emit-llvm
+opt =  
+# running opt with ISE pass: 
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 2

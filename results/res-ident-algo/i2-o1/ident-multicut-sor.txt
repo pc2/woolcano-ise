@@ -1,0 +1,38 @@
+
+
+app  = sor
+algo = multicut
+arch = virtex
+gcc =   -emit-llvm
+opt =  
+# running opt with ISE pass: 
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 2
+Nodes	, msecs		, it	, candidate_nodes
+2	, 0.05444	, 1837	, 0
+2	, 0.05447	, 1836	, 0
+3	, 0.07452	, 1342	, 0
+3	, 0.07479	, 1337	, 0
+4	, 0.08130	, 1230	, 0
+5	, 0.22321	, 448	, 0
+5	, 0.22523	, 444	, 0
+5	, 0.27933	, 358	, 0
+5	, 0.28011	, 357	, 0
+8	, 0.96154	, 104	, 0
+10	, 1.40845	, 71	, 0
+10	, 1.75439	, 57	, 0
+14	, 2.08333	, 48	, 0
+14	, 24.60000	, 5	, 0
+15	, 3.88462	, 26	, 0
+15	, 4.20833	, 24	, 0
+29	, 40.66670	, 3	, 0
+29	, 53.00000	, 2	, 0

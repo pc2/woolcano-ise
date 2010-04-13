@@ -1,0 +1,55 @@
+
+
+app  = sha
+algo = multicut
+arch = virtex
+gcc =   -emit-llvm
+opt =  
+# running opt with ISE pass: 
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 2
+Nodes	, msecs		, it	, candidate_nodes
+3	, 0.05258	, 1902	, 0
+6	, 0.07770	, 1287	, 0
+7	, 0.80000	, 125	, 0
+8	, 0.24938	, 401	, 0
+8	, 0.25000	, 400	, 0
+8	, 0.46083	, 217	, 0
+9	, 0.14409	, 694	, 0
+10	, 0.40161	, 249	, 0
+10	, 0.67114	, 149	, 0
+10	, 0.67568	, 148	, 0
+10	, 0.80645	, 124	, 0
+10	, 1.71186	, 59	, 0
+11	, 1.48529	, 68	, 0
+11	, 4.00000	, 25	, 0
+12	, 0.33113	, 302	, 0
+15	, 4.16667	, 24	, 0
+16	, 0.31153	, 321	, 0
+19	, 8.58333	, 12	, 0
+24	, 10.60000	, 10	, 0
+24	, 10.60000	, 10	, 0
+24	, 10.70000	, 10	, 0
+24	, 10.70000	, 10	, 0
+24	, 34.33330	, 3	, 0
+25	, 1.80357	, 56	, 0
+26	, 52.00000	, 2	, 0
+29	, 61.00000	, 2	, 0
+32	, 83.00000	, 2	, 0
+33	, 262.00000	, 1	, 0
+33	, 262.00000	, 1	, 0
+34	, 278.00000	, 1	, 0
+35	, 293.00000	, 1	, 0
+41	, 197.00000	, 1	, 0
+48	, 325.00000	, 1	, 0
+53	, 405.00000	, 1	, 0
+147	, 9275.00000	, 1	, 0
