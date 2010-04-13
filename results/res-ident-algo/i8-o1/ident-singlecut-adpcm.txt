@@ -1,0 +1,57 @@
+
+
+app  = adpcm
+algo = singlecut
+arch = virtex
+opt  = -ise-archi-max-input=8 -ise-archi-max-output=1
+gcc =   -emit-llvm
+# calculating candidates
+# calculating benchmarking results
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 8
+Nodes	, msecs		, it	, candidate_nodes
+3	, 0.03465	, 2886	, 3
+3	, 0.03487	, 2868	, 3
+3	, 0.03492	, 2864	, 3
+4	, 0.03843	, 2602	, 1
+5	, 0.05048	, 1981	, 4
+5	, 0.06680	, 1497	, 6
+5	, 0.06698	, 1493	, 6
+5	, 0.06702	, 1492	, 6
+5	, 0.06711	, 1490	, 10
+5	, 0.06716	, 1489	, 6
+6	, 0.07062	, 1416	, 10
+6	, 0.07067	, 1415	, 10
+7	, 0.08375	, 1194	, 7
+7	, 0.08389	, 1192	, 7
+8	, 0.06983	, 1432	, 2
+8	, 0.06993	, 1430	, 2
+10	, 0.11223	, 891	, 7
+11	, 0.09058	, 1104	, 4
+11	, 0.27933	, 358	, 20
+11	, 0.28090	, 356	, 28
+11	, 0.28249	, 354	, 28
+12	, 0.10278	, 973	, 6
+12	, 0.13423	, 745	, 7
+12	, 0.16181	, 618	, 10
+14	, 0.17094	, 585	, 10
+14	, 0.17094	, 585	, 8
+14	, 0.20790	, 481	, 8
+17	, 0.22523	, 444	, 10
+18	, 0.34247	, 292	, 20
+18	, 0.34602	, 289	, 20
+20	, 0.42373	, 236	, 17
+21	, 0.72464	, 138	, 29
+31	, 1.61290	, 62	, 89
+38	, 3.12500	, 32	, 164
+38	, 3.15625	, 32	, 164
+55	, 6.66667	, 15	, 156

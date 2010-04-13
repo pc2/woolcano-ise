@@ -1,0 +1,7 @@
+
+
+app  = sha
+algo = multicut
+arch = virtex
+gcc =   -emit-llvm
+opt =  

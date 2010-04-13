@@ -1,0 +1,55 @@
+
+
+app  = md5
+algo = maxmiso
+arch = virtex
+opt  = -ise-archi-max-input=4 -ise-archi-max-output=2
+gcc =   -emit-llvm
+# calculating candidates
+# calculating benchmarking results
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 4
+- changing value of MaxOutput_: 2
+Nodes	, msecs		, it	, candidate_nodes
+2	, 0.02062	, 4850	, 1
+3	, 0.02425	, 4123	, 0
+3	, 0.02437	, 4103	, 1
+3	, 0.02452	, 4079	, 1
+4	, 0.02656	, 3765	, 1
+4	, 0.02657	, 3764	, 1
+4	, 0.02757	, 3627	, 1
+5	, 0.02972	, 3365	, 1
+5	, 0.03008	, 3325	, 1
+6	, 0.03253	, 3074	, 1
+7	, 0.03711	, 2695	, 2
+7	, 0.03741	, 2673	, 2
+7	, 0.03870	, 2584	, 3
+10	, 0.04671	, 2141	, 1
+10	, 0.04697	, 2129	, 1
+10	, 0.04873	, 2052	, 1
+11	, 0.04970	, 2012	, 2
+12	, 0.05444	, 1837	, 3
+12	, 0.05447	, 1836	, 2
+12	, 0.05470	, 1828	, 3
+13	, 0.05559	, 1799	, 2
+13	, 0.05790	, 1727	, 2
+15	, 0.06386	, 1566	, 4
+17	, 0.07037	, 1421	, 2
+19	, 0.07734	, 1293	, 3
+20	, 0.07930	, 1261	, 3
+21	, 0.08071	, 1239	, 5
+27	, 0.09980	, 1002	, 6
+37	, 0.13141	, 761	, 6
+39	, 0.13351	, 749	, 8
+55	, 0.19417	, 515	, 9
+87	, 0.28653	, 349	, 21
+959	, 2.94118	, 34	, 81

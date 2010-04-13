@@ -1,0 +1,8 @@
+
+
+app  = aes
+algo = union
+arch = virtex
+opt  = -ise-archi-max-input=8 -ise-archi-max-output=2
+gcc =   -emit-llvm
+# calculating candidates

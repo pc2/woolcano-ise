@@ -1,0 +1,40 @@
+
+
+app  = sor
+algo = maxmiso
+arch = virtex
+opt  = -ise-archi-max-input=8 -ise-archi-max-output=2
+gcc =   -emit-llvm
+opt =  
+# running opt with ISE pass: 
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 8
+- changing value of MaxOutput_: 2
+Nodes	, msecs		, it	, candidate_nodes
+2	, 0.02050	, 4877	, 1
+2	, 0.02101	, 4760	, 0
+3	, 0.02442	, 4095	, 1
+3	, 0.02456	, 4071	, 0
+4	, 0.02689	, 3719	, 1
+5	, 0.02931	, 3412	, 1
+5	, 0.02936	, 3406	, 1
+5	, 0.03114	, 3211	, 2
+5	, 0.03150	, 3175	, 2
+8	, 0.04174	, 2396	, 3
+10	, 0.04598	, 2175	, 2
+10	, 0.04773	, 2095	, 3
+14	, 0.05672	, 1763	, 1
+14	, 0.05949	, 1681	, 3
+15	, 0.06215	, 1609	, 4
+15	, 0.06321	, 1582	, 3
+29	, 0.10616	, 942	, 3
+29	, 0.10616	, 942	, 4

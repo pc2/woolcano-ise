@@ -1,0 +1,56 @@
+
+
+app  = sha
+algo = union
+arch = virtex
+opt  = -ise-archi-max-input=4 -ise-archi-max-output=1
+gcc =   -emit-llvm
+opt =  
+# running opt with ISE pass: 
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 4
+Nodes	, msecs		, it	, candidate_nodes
+3	, 0.04936	, 2026	, 0
+6	, 0.14347	, 697	, 1
+7	, 0.91743	, 109	, 13
+8	, 0.38461	, 260	, 4
+8	, 0.50505	, 198	, 6
+8	, 0.55556	, 180	, 9
+9	, 0.30030	, 333	, 3
+10	, 0.47619	, 210	, 6
+10	, 0.47847	, 209	, 6
+10	, 0.48077	, 208	, 6
+10	, 0.53476	, 187	, 8
+10	, 0.82645	, 121	, 13
+11	, 0.70422	, 142	, 12
+11	, 0.99010	, 101	, 21
+12	, 0.42194	, 237	, 5
+15	, 1.11111	, 90	, 22
+16	, 0.32362	, 309	, 2
+19	, 1.38889	, 72	, 26
+24	, 2.56410	, 39	, 26
+24	, 2.56410	, 39	, 26
+24	, 2.58974	, 39	, 26
+24	, 2.61538	, 39	, 26
+24	, 4.04000	, 25	, 41
+25	, 0.61728	, 162	, 5
+26	, 2.61538	, 39	, 55
+29	, 2.80556	, 36	, 56
+32	, 2.94118	, 34	, 55
+33	, 6.31250	, 16	, 120
+33	, 6.37500	, 16	, 120
+34	, 6.66667	, 15	, 115
+35	, 6.43750	, 16	, 116
+41	, 4.12000	, 25	, 74
+48	, 13.87500	, 8	, 89
+53	, 5.26316	, 19	, 96
+147	, 1951.00000	, 1	, 275

@@ -1,0 +1,8 @@
+
+
+app  = md5
+algo = union
+arch = virtex
+opt  = -ise-archi-max-input=8 -ise-archi-max-output=1
+gcc =   -emit-llvm
+# calculating candidates

@@ -1,0 +1,60 @@
+
+
+app  = whetstone
+algo = singlecut
+arch = virtex
+opt  = -ise-archi-max-input=8 -ise-archi-max-output=1
+gcc =   -emit-llvm
+opt =  
+# running opt with ISE pass: 
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 8
+Nodes	, msecs		, it	, candidate_nodes
+3	, 0.02931	, 3412	, 0
+3	, 0.02953	, 3386	, 1
+3	, 0.03076	, 3251	, 1
+3	, 0.03119	, 3206	, 1
+4	, 0.02879	, 3474	, 0
+4	, 0.03448	, 2900	, 0
+4	, 0.03605	, 2774	, 1
+4	, 0.04045	, 2472	, 3
+5	, 0.04144	, 2413	, 3
+5	, 0.04344	, 2302	, 1
+5	, 0.04771	, 2096	, 3
+6	, 0.05184	, 1929	, 2
+6	, 0.05814	, 1720	, 4
+6	, 0.05872	, 1703	, 4
+7	, 0.05314	, 1882	, 3
+7	, 0.10183	, 982	, 9
+7	, 0.10204	, 980	, 9
+7	, 0.10204	, 980	, 9
+7	, 0.10214	, 979	, 9
+8	, 0.06361	, 1572	, 3
+8	, 0.06959	, 1437	, 4
+9	, 0.07924	, 1262	, 3
+9	, 0.12210	, 819	, 9
+10	, 0.10030	, 997	, 6
+10	, 0.11062	, 904	, 6
+10	, 0.16155	, 619	, 12
+12	, 0.10428	, 959	, 4
+12	, 0.17153	, 583	, 13
+14	, 0.24570	, 407	, 16
+14	, 0.43668	, 229	, 17
+15	, 0.14286	, 700	, 5
+15	, 0.18083	, 553	, 7
+18	, 0.21413	, 467	, 9
+19	, 0.19763	, 506	, 9
+24	, 0.33670	, 297	, 12
+29	, 1.96078	, 51	, 66
+31	, 2.19565	, 46	, 69
+39	, 2.02000	, 50	, 57
+39	, 2.72973	, 37	, 46
