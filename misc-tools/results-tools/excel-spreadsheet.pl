@@ -5,10 +5,12 @@
 
 
 if ($#ARGV == -1) {
-  printf STDERR "usage: $0 dir_with_res\n";
+  printf STDERR "usage: $0 dir_with_res (dst_dir)\n";
   exit 1;
 }
 my $RES_DIR = $ARGV[0];
+my $DST_DIR = $ARGV[1] || $RES_DIR;
+mkdir $DST_DIR unless -d $DST_DIR;
 
 # this is used to adjust no of rows when there are no $RES_DIR
 %bb_no= (
@@ -29,10 +31,13 @@ my @apps = sort keys %bb_no;
 my @oi = `ls $RES_DIR`;
 foreach $oi (@oi) {
   chomp $oi;
+  #  skip if thats not a dir
   next unless -d "$RES_DIR/$oi";
+  #  skip if thats the dir with results
+  next if $oi =~  /$DST_DIR/;
 
   foreach $algo (@algos) {
-    open(DST,"> $RES_DIR/$algo-$oi-excel.txt");
+    open(DST,"> $DST_DIR/$algo-$oi-excel.txt");
     print DST "$algo\t, size\t, time\t, it\t, cand\t,\n";
 
     foreach $app (@apps) {
@@ -53,3 +58,17 @@ foreach $oi (@oi) {
   }
 }
 
+foreach $oi (@oi) {
+  chomp $oi;
+  #  skip if thats not a dir
+  next unless -d "$RES_DIR/$oi";
+  #  skip if thats the dir with results
+  next if $oi =~  /$DST_DIR/;
+
+
+  my $files = "";
+  foreach $algo (@algos) {
+    $files .= "$DST_DIR/$algo-$oi-excel.txt ";
+  }
+  system("paste $files > $DST_DIR/$oi.txt");
+}
