@@ -12,7 +12,7 @@ find $1 -type f -name \*.txt | while read file; do
   else
    grep , $file  | awk '{ if ($1 ~ /[0-9]/  && $2 == "," ) print }' | egrep -q ","
    if [ ! $? == 0 ] ; then
-      echo -e "no results: "
+      echo -n "no results: "
       mv -v $file $file.bak
    fi;
   fi;
