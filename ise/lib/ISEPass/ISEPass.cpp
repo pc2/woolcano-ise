@@ -27,9 +27,12 @@
 #include <llvm/Pass.h>
 #include <llvm/Support/CommandLine.h>
 #include <llvm/Analysis/ProfileInfoLoader.h>
-#include  <llvm/Support/Debug.h> 
+#include <llvm/Support/Debug.h> 
+
 #include <vector>
 #include <map>
+#include <csignal>
+
 #include "IseAlgorithm.h"
 #include "DataFlowGraph.h"
 #include "ArchitectureVirtexFx.h"
@@ -127,12 +130,15 @@ static cl::opt<string> ISEAlgorithm("ise-algorithm", cl::init("maxmiso"),
 static cl::opt<bool> ISEAlgorithmStop("ise-algorithm-stop", 
                                       cl::init(false),
                                       cl::desc("Show only result of identification algorithm and then stop."));
-
+static cl::opt<int> ISEAlarmStop("ise-alarm-stop",
+                                 cl::init(0),
+                                 cl::desc("Stop execution after specified time [seconds]"));
 
 /* Selection Algorithm - selects apropriate BB from identificated graphs */
 static cl::opt<string> ISESelAlgorithm("ise-sel-algorithm", cl::init("method1"),
                                        cl::value_desc("algorithm"),
                                        cl::desc("Select ISE selection algorithm: method1 (def.), random"));
+
 
 namespace {
 	class ISEPass : public ModulePass
@@ -149,11 +155,16 @@ namespace {
 		void moveSubgraphToFunction(BasicBlock* bb, const DataFlowGraph &dfg,
                                     const string &name, ValueMap &replaced);
 		DataFlowGraph dfgFromBasicBlock(const BasicBlock* bb);
+        static void SignalHandler(int sig) {
+            llvm::cout << "\ndupa\n";
+            llvm::cout.flush();
+            exit(-1);
+        }
 	public:
 		static char ID;
 		virtual bool runOnModule(Module &M);
 		virtual void getAnalysisUsage(AnalysisUsage &AU) const;
-		ISEPass() : ModulePass(&ID) {}
+		ISEPass() : ModulePass(&ID) { } 
 	};
     
 	class RuntimeEstimationPass : public ModulePass
@@ -288,6 +299,15 @@ IseAlgorithm* ISEPass::getIdentificationAlgorithm(void)
 /* main - executed on every module */
 bool ISEPass::runOnModule(Module &M)
 {
+    if (ISEAlarmStop) {
+        llvm::cout << "ISEAlarmStop = " << ISEAlarmStop << "\n";
+        llvm::cout.flush();
+        ::signal(SIGALRM, SignalHandler);
+        ::signal(SIGINT, SignalHandler);
+        ::signal(SIGQUIT, SignalHandler);
+        ::alarm( ISEAlarmStop );
+    }
+    
 	readProfilingInfo(M);
 	// custom instruction identification
 	IseAlgorithm *algo = getIdentificationAlgorithm();
