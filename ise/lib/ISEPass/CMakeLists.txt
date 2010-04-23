@@ -1,6 +1,6 @@
 set(target LLVMISEPass)
 add_llvm_library(${target} MODULE ISEPass.cpp)
-target_link_libraries(${target} LLVMISECommon)
+target_link_libraries(${target} LLVMISECommon -lboost_serialization)
 
 if (APPLE)
   set(CMAKE_MODULE_LINKER_FLAGS "-undefined dynamic_lookup")

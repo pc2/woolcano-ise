@@ -27,6 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <fstream>
 #include "Util.h"
+#include <string>
 
 using namespace std;
 
@@ -68,3 +69,4 @@ bool Util::fileExists(const string &filename)
 	}
 	return false;
 }
+

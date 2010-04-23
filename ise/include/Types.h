@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _ISE_TYPES_H_
 
 #include <llvm/BasicBlock.h>
-#include <boost/dynamic_bitset.hpp>
+#include "dynamic_bitset.hpp"
 #include <map>
 #include <list>
 #include <utility>
