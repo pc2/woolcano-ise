@@ -1,8 +1,5 @@
 #!/bin/bash
 
-
-
-
 DST_DIR=results
 
 # removing tasks which are not finished
@@ -17,7 +14,8 @@ mkdir -p $dir
 for app in adpcm aes blowfish cjpeg fft sha sor whetstone md5; do
   OUT="$dir/ident-${algo}-${app}.txt"
   if [ ! -e $OUT ] ; then 
-    echo "mkdir -p $dir && ./make_bench.sh $algo $app 2>&1 |  tee $OUT"
+    opt="-ise-alarm-stop=3600 "
+    echo "mkdir -p $dir && ./make_bench.sh $algo $app i0-o0 $opt 2>&1 |  tee $OUT"
   fi
 done;
 
@@ -33,8 +31,8 @@ for i in 2 4 8; do
       for app in adpcm aes blowfish cjpeg fft sha sor whetstone md5; do
         OUT="$dir/ident-${algo}-${app}.txt"
         if [ ! -e $OUT ] ; then 
-          opt="-ise-archi-max-input=${i} -ise-archi-max-output=${o}"
-          echo "mkdir -p $dir && ./make_bench.sh $algo $app $opt 2>&1 |  tee $OUT"
+          opt="-ise-alarm-stop=3600 -ise-archi-max-input=${i} -ise-archi-max-output=${o}"
+          echo "mkdir -p $dir && ./make_bench.sh $algo $app i${i}-o${o} $opt 2>&1 |  tee $OUT"
         fi
       done;
     done;
