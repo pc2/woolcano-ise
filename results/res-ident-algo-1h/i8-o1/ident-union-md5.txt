@@ -1,0 +1,42 @@
+
+
+app  = md5
+algo = union
+arch = virtex
+opt  = -ise-alarm-stop=3600 -ise-archi-max-input=8 -ise-archi-max-output=1
+gcc =   -emit-llvm
+# calculating candidates
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 8
+# calculating benchmarking results
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 8
+DAG_size	, msecs		, it	, candidate_found
+2		, 0.10256	, 975	, 1
+3		, 0.11614	, 861	, 1
+4		, 0.33223	, 301	, 6
+6		, 0.74627	, 134	, 17
+10		, 0.59880	, 167	, 9
+27		, 2.63158	, 38	, 51
+37		, 3.92308	, 26	, 72
+39		, 22.80000	, 5	, 395
+55		, 9.54545	, 11	, 99
+959		, 	, 	, 

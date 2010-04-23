@@ -1,0 +1,56 @@
+
+
+app  = aes
+algo = union
+arch = virtex
+opt  = -ise-alarm-stop=3600 -ise-archi-max-input=4 -ise-archi-max-output=2
+gcc =   -emit-llvm
+# calculating candidates
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 4
+- changing value of MaxOutput_: 2
+mv: cannot stat `cand*.dat': No such file or directory
+# calculating benchmarking results
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 4
+- changing value of MaxOutput_: 2
+DAG_size	, msecs		, it	, candidate_found
+3		, 0.19417	, 515	, 3
+3		, 0.19455	, 514	, 3
+3		, 0.19608	, 510	, 3
+3		, 0.19685	, 508	, 3
+4		, 0.20833	, 480	, 3
+5		, 0.20619	, 485	, 3
+5		, 0.21978	, 455	, 3
+6		, 0.18762	, 533	, 2
+6		, 0.72464	, 138	, 17
+6		, 0.72464	, 138	, 17
+6		, 0.72464	, 138	, 17
+7		, 0.68027	, 147	, 15
+8		, 0.35088	, 285	, 6
+8		, 0.49505	, 202	, 10
+8		, 0.86207	, 116	, 16
+10		, 1.66667	, 60	, 37
+12		, 1.75439	, 57	, 40
+15		, 2.70270	, 37	, 41
+24		, 5.36842	, 19	, 50
+34		, 2.91429	, 35	, 48
+73		, 	, 	, 

@@ -1,0 +1,62 @@
+
+
+app  = sor
+algo = union
+arch = virtex
+opt  = -ise-alarm-stop=3600 -ise-archi-max-input=2 -ise-archi-max-output=1
+gcc =   -emit-llvm
+# calculating candidates
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 2
+===-------------------------------------------------------------------------===
+                      ... Pass execution timing report ...
+===-------------------------------------------------------------------------===
+  Total Execution Time: 0.0249 seconds (0.0252 wall clock)
+
+   ---User Time---   --User+System--   ---Wall Time---  ---Mem---  --- Name ---
+   0.0239 ( 95.9%)   0.0239 ( 95.9%)   0.0246 ( 97.6%)       2296  instruction-set extension (identification & selection)
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0003 (  1.4%)        136  Module Verifier
+   0.0010 (  4.0%)   0.0010 (  4.0%)   0.0002 (  0.8%)         16  Dominator Tree Construction
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)          0  Preliminary module verification
+   0.0249 (100.0%)   0.0249 (100.0%)   0.0252 (100.0%)       2448  TOTAL
+
+# calculating benchmarking results
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 2
+DAG_size	, msecs		, it	, candidate_found
+2		, 0.05491	, 1821	, 0
+2		, 0.18450	, 542	, 3
+3		, 0.10741	, 931	, 1
+3		, 0.19724	, 507	, 3
+4		, 0.20161	, 496	, 3
+5		, 0.34483	, 290	, 4
+5		, 0.46296	, 216	, 9
+5		, 0.46296	, 216	, 9
+5		, 0.46729	, 214	, 6
+8		, 0.54348	, 184	, 9
+10		, 0.70422	, 142	, 8
+10		, 0.95238	, 105	, 17
+14		, 0.92593	, 108	, 13
+14		, 1.72414	, 58	, 29
+15		, 0.95238	, 105	, 13
+15		, 1.12360	, 89	, 13
+29		, 2.04082	, 49	, 19
+29		, 2.50000	, 40	, 29

@@ -1,0 +1,64 @@
+
+
+app  = sor
+algo = singlecut
+arch = virtex
+opt  = -ise-alarm-stop=3600 -ise-archi-max-input=8 -ise-archi-max-output=2
+gcc =   -emit-llvm
+# calculating candidates
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 8
+- changing value of MaxOutput_: 2
+===-------------------------------------------------------------------------===
+                      ... Pass execution timing report ...
+===-------------------------------------------------------------------------===
+  Total Execution Time: 0.0549 seconds (0.0899 wall clock)
+
+   ---User Time---   --User+System--   ---Wall Time---  ---Mem---  --- Name ---
+   0.0539 ( 98.1%)   0.0539 ( 98.1%)   0.0893 ( 99.2%)       2104  instruction-set extension (identification & selection)
+   0.0010 (  1.8%)   0.0010 (  1.8%)   0.0003 (  0.4%)        136  Module Verifier
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0002 (  0.2%)         16  Dominator Tree Construction
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)          0  Preliminary module verification
+   0.0549 (100.0%)   0.0549 (100.0%)   0.0899 (100.0%)       2256  TOTAL
+
+# calculating benchmarking results
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 8
+- changing value of MaxOutput_: 2
+DAG_size	, msecs		, it	, candidate_found
+2		, 0.02589	, 3863	, 3
+2		, 0.02623	, 3813	, 1
+3		, 0.03353	, 2982	, 3
+3		, 0.03427	, 2918	, 1
+4		, 0.03845	, 2601	, 3
+5		, 0.06510	, 1536	, 6
+5		, 0.06523	, 1533	, 13
+5		, 0.06640	, 1506	, 13
+5		, 0.06906	, 1448	, 13
+8		, 0.20408	, 490	, 36
+10		, 0.25445	, 393	, 55
+10		, 0.27322	, 366	, 78
+14		, 0.44643	, 224	, 69
+14		, 1.74138	, 58	, 410
+15		, 0.74074	, 135	, 83
+15		, 0.81301	, 123	, 137
+29		, 10.00000	, 10	, 797
+29		, 9.63636	, 11	, 350
