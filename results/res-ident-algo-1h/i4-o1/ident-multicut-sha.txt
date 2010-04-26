@@ -1,0 +1,79 @@
+
+
+app  = sha
+algo = multicut
+arch = virtex
+opt  = -ise-alarm-stop=3600 -ise-archi-max-input=4 -ise-archi-max-output=1
+gcc =   -emit-llvm
+# calculating candidates
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 4
+===-------------------------------------------------------------------------===
+                      ... Pass execution timing report ...
+===-------------------------------------------------------------------------===
+  Total Execution Time: 12.9470 seconds (12.9477 wall clock)
+
+   ---User Time---   --System Time--   --User+System--   ---Wall Time---  ---Mem---  --- Name ---
+  12.9440 ( 99.9%)   0.0009 (100.0%)  12.9450 ( 99.9%)  12.9460 ( 99.9%)       5880  instruction-set extension (identification & selection)
+   0.0020 (  0.0%)   0.0000 (  0.0%)   0.0020 (  0.0%)   0.0013 (  0.0%)        136  Module Verifier
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0003 (  0.0%)         16  Dominator Tree Construction
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)          0  Preliminary module verification
+  12.9460 (100.0%)   0.0009 (100.0%)  12.9470 (100.0%)  12.9477 (100.0%)       6032  TOTAL
+
+# calculating benchmarking results
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 4
+DAG_size	, msecs		, it	, candidate_found
+3		, 0.05249	, 1905	, 0
+6		, 0.07669	, 1304	, 0
+7		, 0.81301	, 123	, 0
+8		, 0.25381	, 394	, 0
+8		, 0.25445	, 393	, 0
+8		, 0.46729	, 214	, 0
+9		, 0.14389	, 695	, 0
+10		, 0.41152	, 243	, 0
+10		, 0.68966	, 145	, 0
+10		, 0.68966	, 145	, 0
+10		, 0.81967	, 122	, 0
+10		, 1.75439	, 57	, 0
+11		, 1.56250	, 64	, 0
+11		, 4.12000	, 25	, 0
+12		, 0.34014	, 294	, 0
+15		, 4.43478	, 23	, 0
+16		, 0.31949	, 313	, 0
+19		, 8.75000	, 12	, 0
+24		, 11.33330	, 9	, 0
+24		, 11.33330	, 9	, 0
+24		, 11.55560	, 9	, 0
+24		, 11.55560	, 9	, 0
+24		, 35.00000	, 3	, 0
+25		, 1.87037	, 54	, 0
+26		, 57.00000	, 2	, 0
+29		, 65.50000	, 2	, 0
+32		, 100.00000	, 2	, 0
+33		, 450.50000	, 2	, 0
+33		, 450.50000	, 2	, 0
+34		, 546.00000	, 2	, 0
+35		, 552.50000	, 2	, 0
+41		, 216.00000	, 2	, 0
+48		, 348.50000	, 2	, 0
+53		, 439.50000	, 2	, 0
+147		, 10021.50000	, 2	, 0

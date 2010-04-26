@@ -1,0 +1,45 @@
+
+
+app  = md5
+algo = multicut
+arch = virtex
+opt  = -ise-alarm-stop=3600 -ise-archi-max-input=2 -ise-archi-max-output=2
+gcc =   -emit-llvm
+# calculating candidates
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 2
+- changing value of MaxOutput_: 2
+mv: cannot stat `cand*.dat': No such file or directory
+# calculating benchmarking results
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 2
+- changing value of MaxOutput_: 2
+DAG_size	, msecs		, it	, candidate_found
+2		, 0.05485	, 1823	, 0
+3		, 0.05371	, 1862	, 0
+4		, 0.12595	, 794	, 0
+6		, 0.70422	, 142	, 0
+10		, 1.62903	, 62	, 0
+27		, 4958.00000	, 2	, 0
+37		, 36830.00000	, 1	, 0
+39		, 88849.00000	, 1	, 0
+55		, 243567.00000	, 1	, 0
+959		, 	, 	, 

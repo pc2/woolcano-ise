@@ -1,0 +1,42 @@
+
+
+app  = md5
+algo = multicut
+arch = virtex
+opt  = -ise-alarm-stop=3600 -ise-archi-max-input=4 -ise-archi-max-output=1
+gcc =   -emit-llvm
+# calculating candidates
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 4
+# calculating benchmarking results
+WARNING: no profiling information found, assuming uniform distribution
+Selected architecture: P20ArchitectureVirtexFx
+Default settings: 
+ * CommInBusCLK: 2
+ * CommOutBusCLK_: 2
+ * CommInBusWidth_: 2
+ * CommOutBusWidth_: 1
+ * MaxCI: 7
+ * MaxInput: 6
+ * MaxOutput: 1
+- changing value of MaxInput_: 4
+DAG_size	, msecs		, it	, candidate_found
+2		, 0.05373	, 1861	, 0
+3		, 0.05345	, 1871	, 0
+4		, 0.12854	, 778	, 0
+6		, 0.63291	, 158	, 0
+10		, 0.61728	, 162	, 0
+27		, 48.00000	, 3	, 0
+37		, 147.50000	, 2	, 0
+39		, 988.00000	, 2	, 0
+55		, 416.50000	, 2	, 0
+959		, 	, 	, 
