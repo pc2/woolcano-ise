@@ -3,7 +3,7 @@
 TITLE=""
 EPSFILE=""
 
-if [ $# == 2 ]; then
+if [ $# !=  0 ]; then
 	PAT=$*
 	TITLE="$1"
 	EPSFILE=`echo "$PAT" | sed 's/[\/\*]//g' `
@@ -12,6 +12,8 @@ else
 	echo -e " file		: single file with data to plot"
 	echo -e " files		: pattern mask like *.txt or maxmiso/*.txt"
 	echo -e " WARNING	remember to put file in \"\" since this will be used as title"
+  echo ""
+  echo "Example: $0 \"maxmiso/*.txt\""
 	exit 1
 fi
 
