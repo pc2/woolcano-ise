@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ArchitectureVirtexFx.h"
 #include <llvm/Instructions.h>
+#include <llvm/Support/Debug.h>
 #include <math.h>
 
 using namespace llvm;
@@ -62,17 +63,19 @@ ArchitectureVirtexFx::ArchitectureVirtexFx(
     MaxOutput_ = MaxOutput;
     
   
-    std::cerr << "Selected architecture: " <<  typeid(this).name() << 
-    "\nDefault settings: " <<
-    "\n * CommInBusCLK: " << CommInBusCLK_ << 
-    "\n * CommOutBusCLK_: " << CommOutBusCLK_ << 
-    
-    "\n * CommInBusWidth_: " << CommInBusWidth_ <<
-    "\n * CommOutBusWidth_: " << CommOutBusWidth_ <<
-    
-    "\n * MaxCI: " << MaxCI_ <<
-    "\n * MaxInput: " << MaxInput_ <<
-    "\n * MaxOutput: " << MaxOutput_ << "\n";
+    DEBUG(
+	std::cerr << "Selected architecture: " <<  typeid(this).name() << 
+	"\nDefault settings: " <<
+	"\n * CommInBusCLK: " << CommInBusCLK_ << 
+	"\n * CommOutBusCLK_: " << CommOutBusCLK_ << 
+
+	"\n * CommInBusWidth_: " << CommInBusWidth_ <<
+	"\n * CommOutBusWidth_: " << CommOutBusWidth_ <<
+
+	"\n * MaxCI: " << MaxCI_ <<
+	"\n * MaxInput: " << MaxInput_ <<
+	"\n * MaxOutput: " << MaxOutput_ << "\n"
+	);
 }
 
 
