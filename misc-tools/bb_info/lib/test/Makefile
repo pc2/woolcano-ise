@@ -10,7 +10,7 @@ all: test_opt
 test_opt: $(SOURCE).bc
 	@echo ""
 	@echo "-----------------------------------"
-	opt -load ../../Debug/lib/dotBB.dylib -dot-from-bb -disable-output $< 
+	opt -load ../../Debug/lib/bb-info.so -bb_info -bb-info-detailed -disable-output $< 
 	
 $(SOURCE).bc: $(SOURCE).cc
 	$(CC) $(CFLAGS) -c $? -o $(SOURCE).bc
