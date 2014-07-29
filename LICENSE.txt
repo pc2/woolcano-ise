@@ -1,10 +1,6 @@
-This work is based on code from Martin Tofall.
-License: BSD
-
-
 =============================================================================
 
-Copyright (c) 2009, Martin Tofall
+Copyright (c) 2009-2014, University of Paderborn
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
